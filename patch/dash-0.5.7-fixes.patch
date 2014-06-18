@@ -1,0 +1,11 @@
+diff -Naur old/dash-0.5.7/src/histedit.c new/dash-0.5.7/src/histedit.c
+--- old/dash-0.5.7/src/histedit.c	2011-03-15 08:18:06.000000000 +0100
++++ new/dash-0.5.7/src/histedit.c	2014-06-15 22:55:42.069530405 +0200
+@@ -39,6 +39,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <getopt.h>
+ /*
+  * Editline and history functions (and glue).
+  */

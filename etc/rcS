@@ -1,0 +1,13 @@
+#!/bin/sh
+echo "Starting Toyroot ..."
+
+echo "Mounting filesystems ..."
+mount -n -o remount /
+echo -n > /etc/mtab
+mount -o remount /
+[ -e /dev/pts ] && rm -fr /dev/pts
+[ -e /dev/shm ] && rm -fr /dev/shm
+mkdir -p /dev/pts
+mkdir -p /dev/shm
+mount -a
+

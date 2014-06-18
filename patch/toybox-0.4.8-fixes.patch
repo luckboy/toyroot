@@ -1,0 +1,26 @@
+diff -Naur old/toybox-0.4.8/toys/posix/id.c new/toybox-0.4.8/toys/posix/id.c
+--- old/toybox-0.4.8/toys/posix/id.c	2014-04-17 02:49:15.000000000 +0200
++++ new/toybox-0.4.8/toys/posix/id.c	2014-06-15 09:50:47.957796603 +0200
+@@ -102,7 +102,10 @@
+   i = sizeof(toybuf)/sizeof(gid_t);
+   ngroups = username ? getgrouplist(username, gid, groups, &i)
+     : getgroups(i, groups);
+-  if (0 >= ngroups) perror_exit(0);
++  if (0 >= ngroups) {
++    xputc('\n');
++    return;
++  }
+ 
+   for (i = 0;;) {
+     if (!(grp = getgrgid(groups[i]))) perror_msg(0);
+diff -Naur old/toybox-0.4.8/toys.h new/toybox-0.4.8/toys.h
+--- old/toybox-0.4.8/toys.h	2014-04-17 02:49:15.000000000 +0200
++++ new/toybox-0.4.8/toys.h	2014-06-15 09:48:30.637798642 +0200
+@@ -67,6 +67,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/statfs.h>
+ #include <sys/sysinfo.h>
++#include <sys/ttydefaults.h>
+ 
+ #include "lib/lib.h"
+ #include "toys/e2fs.h"

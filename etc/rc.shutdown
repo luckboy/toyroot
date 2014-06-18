@@ -1,0 +1,23 @@
+#!/bin/sh
+echo "Shutdowning Toyout ..."
+
+echo "Terminating all processes ..."
+killall5 -15
+sleep 5
+
+echo "Killing all processes ..."
+killall5 -9
+
+echo "Unmouting file systems ..."
+umount -a -r
+mount -o remount,ro /
+
+case "$1" in
+	halt)
+		echo "Halting ..."
+		halt;;
+	*)
+		echo "Rebooting ..."
+		reboot;;
+esac
+

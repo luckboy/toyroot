@@ -1,0 +1,11 @@
+diff -Naur old/sysvinit-2.88dsf/src/init.c new/sysvinit-2.88dsf/src/init.c
+--- old/sysvinit-2.88dsf/src/init.c	2010-04-13 11:48:54.000000000 +0200
++++ new/sysvinit-2.88dsf/src/init.c	2014-06-17 20:32:30.525217486 +0200
+@@ -46,6 +46,7 @@
+ #include <string.h>
+ #include <signal.h>
+ #include <termios.h>
++#include <sys/ttydefaults.h>
+ #include <utmp.h>
+ #include <ctype.h>
+ #include <stdarg.h>
