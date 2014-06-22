@@ -26,15 +26,9 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-MUSL_VERSION=1.0.3
-NCURSES_VERSION=5.9
-LIBEDIT_VERSION=20140213-3.1
-SYSVINIT_VERSION=2.88dsf
-DASH_VERSION=0.5.7
-TOYBOX_VERSION=0.4.8
-UTIL_LINUX_VERSION=2.24.2
+. ./toys.txt
 
-GCC=${GCC:=gcc}
+GCC="${GCC:=gcc}"
 
 ROOT_DIR=`pwd`
 TARGET=`$GCC -dumpmachine`
@@ -42,95 +36,87 @@ HOST=`gcc -dumpmachine`
 ARCH=`$GCC -dumpmachine | cut -d - -f 1`
 STRIP=strip
 INCLUDE_DIR=/usr/include
-if [ $TARGET != $HOST ]; then
-	STRIP=$TARGET-strip
-	INCLUDE_DIR=/usr/$TARGET/include
+if [ "$TARGET" != "$HOST" ]; then
+	STRIP="$TARGET-strip"
+	INCLUDE_DIR="/usr/$TARGET/include"
 fi
 
-ASM_INCLUDE_DIR=$INCLUDE_DIR/asm
-ASM_GENERIC_INCLUDE_DIR=$INCLUDE_DIR/asm-generic
-LINUX_INCLUDE_DIR=$INCLUDE_DIR/linux
+ASM_INCLUDE_DIR="$INCLUDE_DIR/asm"
+ASM_GENERIC_INCLUDE_DIR="$INCLUDE_DIR/asm-generic"
+LINUX_INCLUDE_DIR="$INCLUDE_DIR/linux"
 
-MUSL_GCC=$ROOT_DIR/bin/$ARCH/musl/bin/musl-gcc
+MUSL_GCC="$ROOT_DIR/bin/$ARCH/musl/bin/musl-gcc"
 
-patch_package() {
-	for p in `ls patch/$2-*.patch 2> /dev/null`; do
-		patch -p1 -d build/$ARCH/$1 < $p
-	done
-}
+. ./functions.sh
 
-export REALGCC=$GCC
+export REALGCC="$GCC"
 
-mkdir -p src build/$ARCH bin/$ARCH
+download_source musl-$MUSL_VERSION.tar.gz $MUSL_DOWNLOAD_URL
+download_source ncurses-$NCURSES_VERSION.tar.gz $NCURSES_DOWNLOAD_URL
+download_source libedit-$LIBEDIT_VERSION.tar.gz $LIBEDIT_DOWNLOAD_URL
+download_source sysvinit-$SYSVINIT_VERSION.tar.bz2 $SYSVINIT_DOWNLOAD_URL
+download_source dash-$DASH_VERSION.tar.gz $DASH_DOWNLOAD_URL
+download_source toybox-$TOYBOX_VERSION.tar.bz2 $TOYBOX_DOWNLOAD_URL
+download_source util-linux-$UTIL_LINUX_VERSION.tar.xz $UTIL_DOWNLOAD_URL
 
-[ -f src/musl-$MUSL_VERSION.tar.gz ] || wget -P src http://www.musl-libc.org/releases/musl-$MUSL_VERSION.tar.gz
-[ -f src/ncurses-$NCURSES_VERSION.tar.gz ] || wget -P src ftp://invisible-island.net/ncurses/ncurses-$NCURSES_VERSION.tar.gz
-[ -f src/libedit-$LIBEDIT_VERSION.tar.gz ] || wget -P src http://thrysoee.dk/editline/libedit-$LIBEDIT_VERSION.tar.gz
-[ -f src/sysvinit-$SYSVINIT_VERSION.tar.bz2 ] || wget -P src http://download.savannah.gnu.org/releases/sysvinit/sysvinit-$SYSVINIT_VERSION.tar.bz2
-[ -f src/dash-$DASH_VERSION.tar.gz ] || wget -P src http://gondor.apana.org.au/~herbert/dash/files/dash-$DASH_VERSION.tar.gz
-[ -f src/toybox-$TOYBOX_VERSION.tar.bz2 ] || wget -P src http://www.landley.net/toybox/downloads/toybox-$TOYBOX_VERSION.tar.bz2
-[ -f src/util-linux-$UTIL_LINUX_VERSION.tar.xz ] || wget -P src https://www.kernel.org/pub/linux/utils/util-linux/v`echo $UTIL_LINUX_VERSION | cut -d . -f 1,2`/util-linux-$UTIL_LINUX_VERSION.tar.xz
+extract_and_patch_package musl musl-$MUSL_VERSION.tar.gz musl-$MUSL_VERSION
+extract_and_patch_package ncurses ncurses-$NCURSES_VERSION.tar.gz ncurses-$NCURSES_VERSION
+extract_and_patch_package libedit libedit-$LIBEDIT_VERSION.tar.gz libedit-$LIBEDIT_VERSION
+extract_and_patch_package sysvinit sysvinit-$SYSVINIT_VERSION.tar.bz2 sysvinit-$SYSVINIT_VERSION
+extract_and_patch_package dash dash-$DASH_VERSION.tar.gz dash-$DASH_VERSION
+extract_and_patch_package toybox toybox-$TOYBOX_VERSION.tar.bz2 toybox-$TOYBOX_VERSION
+extract_and_patch_package util-linux util-linux-$UTIL_LINUX_VERSION.tar.xz util-linux-$UTIL_LINUX_VERSION
 
-for p in musl ncurses libedit sysvinit dash toybox util-linux; do
-	mkdir -p build/$ARCH/$p
-done
+mkdir -p "$ROOT_DIR/bin/$ARCH"
 
-[ -d build/$ARCH/musl/musl-$MUSL_VERSION ] || (tar zxf src/musl-$MUSL_VERSION.tar.gz -C build/$ARCH/musl && patch_package musl musl-$MUSL_VERSION)
-[ -d build/$ARCH/ncurses/ncurses-$NCURSES_VERSION ] || (tar zxf src/ncurses-$NCURSES_VERSION.tar.gz -C build/$ARCH/ncurses && patch_package ncurses ncurses-$NCURSES_VERSION)
-[ -d build/$ARCH/libedit/libedit-$LIBEDIT_VERSION ] || (tar zxf src/libedit-$LIBEDIT_VERSION.tar.gz -C build/$ARCH/libedit && patch_package libedit libedit-$LIBEDIT_VERSION)
-[ -d build/$ARCH/sysvinit/sysvinit-$SYSVINIT_VERSION ] || (tar jxf src/sysvinit-$SYSVINIT_VERSION.tar.bz2 -C build/$ARCH/sysvinit && patch_package sysvinit sysvinit-$SYSVINIT_VERSION)
-[ -d build/$ARCH/dash/dash-$DASH_VERSION ] || (tar zxf src/dash-$DASH_VERSION.tar.gz -C build/$ARCH/dash && patch_package dash dash-$DASH_VERSION)
-[ -d build/$ARCH/toybox/toybox-$TOYBOX_VERSION ] || (tar jxf src/toybox-$TOYBOX_VERSION.tar.bz2 -C build/$ARCH/toybox && patch_package toybox toybox-$TOYBOX_VERSION)
-[ -d build/$ARCH/util-linux/util-linux-$UTIL_LINUX_VERSION ] || (tar Jxf src/util-linux-$UTIL_LINUX_VERSION.tar.xz -C build/$ARCH/util-linux && patch_package util-linux util-linux-$UTIL_LINUX_VERSION)
-
-if [ ! -d $ROOT_DIR/bin/$ARCH/musl ]; then
-	cd build/$ARCH/musl/musl-$MUSL_VERSION
-	make clean
-	(CC=$GCC ./configure --prefix=$ROOT_DIR/bin/$ARCH/musl $TARGET && make install) || exit 1
-	ln -sf $ASM_INCLUDE_DIR $ASM_GENERIC_INCLUDE_DIR $LINUX_INCLUDE_DIR $ROOT_DIR/bin/$ARCH/musl/include
+if [ ! -d "$ROOT_DIR/bin/$ARCH/musl" ]; then
+	cd "build/$ARCH/musl/musl-$MUSL_VERSION"
+	[ -f Makefile ] && make clean
+	(CC="$GCC" LDFLAGS=-s ./configure --prefix="$ROOT_DIR/bin/$ARCH/musl" "$TARGET" && make install) || exit 1
+	ln -sf $ASM_INCLUDE_DIR $ASM_GENERIC_INCLUDE_DIR $LINUX_INCLUDE_DIR "$ROOT_DIR/bin/$ARCH/musl/include"
 	cd ../../../..
 fi
-echo $TARGET $HOST
-if [ ! -d $ROOT_DIR/bin/$ARCH/ncurses ]; then
-	cd build/$ARCH/ncurses/ncurses-$NCURSES_VERSION
-	make clean
-	(CC=$MUSL_GCC ./configure --target=$TARGET --host=$TARGET --prefix=/usr --with-shared --without-debug --without-cxx --without-cxx-binding --without-ada --with-normal && make install DESTDIR=$ROOT_DIR/bin/$ARCH/ncurses) || exit 1
+if [ ! -d "$ROOT_DIR/bin/$ARCH/ncurses" ]; then
+	cd "build/$ARCH/ncurses/ncurses-$NCURSES_VERSION"
+	[ -f Makefile ] && make clean
+	(CC="$MUSL_GCC" LDFLAGS=-s ./configure --target=$TARGET --host="$TARGET" --prefix=/usr --with-shared --without-debug --without-cxx --without-cxx-binding --without-ada --with-normal && make install DESTDIR="$ROOT_DIR/bin/$ARCH/ncurses") || exit 1
 	cd ../../../..
 fi
-if [ ! -d $ROOT_DIR/bin/$ARCH/libedit ]; then
-	cd build/$ARCH/libedit/libedit-$LIBEDIT_VERSION
-	make clean
-	(CC=$MUSL_GCC CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS=-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib ./configure --host=$TARGET --prefix=/usr && make install DESTDIR=$ROOT_DIR/bin/$ARCH/libedit) || exit 1
+if [ ! -d "$ROOT_DIR/bin/$ARCH/libedit" ]; then
+	cd "build/$ARCH/libedit/libedit-$LIBEDIT_VERSION"
+	[ -f Makefile ] && make clean
+	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -s" ./configure --host="$TARGET" --prefix=/usr && make install DESTDIR="$ROOT_DIR/bin/$ARCH/libedit") || exit 1
+	"$STRIP" "$ROOT_DIR/bin/$ARCH/libedit/"usr/lib/libedit.so.0.0.*
 	cd ../../../..
 fi
-if [ ! -d $ROOT_DIR/bin/$ARCH/sysvinit ]; then
-	cd build/$ARCH/sysvinit/sysvinit-$SYSVINIT_VERSION
-	make clean
-	make CC=$MUSL_GCC LDFLAGS=-s ROOT=$ROOT_DIR/bin/$ARCH/sysvinit DISTRO=Toyroot all install || exit 1
+if [ ! -d "$ROOT_DIR/bin/$ARCH/sysvinit" ]; then
+	cd "build/$ARCH/sysvinit/sysvinit-$SYSVINIT_VERSION"
+	[ -f Makefile ] && make clean
+	make CC="$MUSL_GCC" LDFLAGS=-s ROOT="$ROOT_DIR/bin/$ARCH/sysvinit" DISTRO=Toyroot all install || exit 1
 	rm -fr $ROOT_DIR/bin/$ARCH/sysvinit/usr/include
 	cd ../../../..
 fi
-if [ ! -d $ROOT_DIR/bin/$ARCH/dash ]; then
-	cd build/$ARCH/dash/dash-$DASH_VERSION
-	make clean
-	(CC=$MUSL_GCC CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses -I$ROOT_DIR/bin/$ARCH/libedit/usr/include" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s" LIBS="-ledit -lncurses" ./configure --host=$TARGET --prefix=/ --datarootdir=/usr/share --with-libedit && make install CC_FOR_BUILD=gcc DESTDIR=$ROOT_DIR/bin/$ARCH/dash) || exit 1
+if [ ! -d "$ROOT_DIR/bin/$ARCH/dash" ]; then
+	cd "build/$ARCH/dash/dash-$DASH_VERSION"
+	[ -f Makefile ] && make clean
+	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses -I$ROOT_DIR/bin/$ARCH/libedit/usr/include" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s" LIBS="-ledit -lncurses" ./configure --host="$TARGET" --prefix=/ --datarootdir=/usr/share --with-libedit && make install CC_FOR_BUILD=gcc DESTDIR="$ROOT_DIR/bin/$ARCH/dash") || exit 1
 	cd ../../../..
 fi
-if [ ! -d $ROOT_DIR/bin/$ARCH/toybox ]; then
-	cd build/$ARCH/toybox/toybox-$TOYBOX_VERSION
-	make clean
+if [ ! -d "$ROOT_DIR/bin/$ARCH/toybox" ]; then
+	cd "build/$ARCH/toybox/toybox-$TOYBOX_VERSION"
+	[ -f Makefile ] && make clean
 	cp $ROOT_DIR/toybox.config .config
-	make CC=$MUSL_GCC STRIP=$STRIP PREFIX=$ROOT_DIR/bin/$ARCH/toybox all install || exit 1
+	make CC="$MUSL_GCC" STRIP="$STRIP" PREFIX="$ROOT_DIR/bin/$ARCH/toybox" all install || exit 1
 	cd ../../../..
 fi
-if [ ! -d $ROOT_DIR/bin/$ARCH/util-linux ]; then
-	cd $ROOT_DIR/bin/$ARCH/toybox
+if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux" ]; then
+	cd "$ROOT_DIR/bin/$ARCH/toybox"
 	TOYBOX_FILES=`find`
 	cd ../../..
 	cd build/$ARCH/util-linux/util-linux-$UTIL_LINUX_VERSION
-	make clean
+	[ -f Makefile ] && make clean
 	find 
-	(CC=$MUSL_GCC CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -lc -s" LIBS="-lncurses" ./configure --host=$TARGET --prefix=/usr --sysconfdir=/etc \
+	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -lc -s" LIBS="-lncurses" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc \
 		--enable-shared \
 		--disable-static \
 		--disable-losetup \
@@ -167,15 +153,28 @@ if [ ! -d $ROOT_DIR/bin/$ARCH/util-linux ]; then
 		--disable-wall \
 		--without-systemdsystemunitdir \
 		PKG_CONFIG="" \
-		&& make install DESTDIR=$ROOT_DIR/bin/$ARCH/util-linux) || exit 1
+		&& make install DESTDIR="$ROOT_DIR/bin/$ARCH/util-linux") || exit 1
 	for file in $TOYBOX_FILES; do
 		[ -e "$ROOT_DIR/bin/$ARCH/util-linux/$file" -a ! -d "$ROOT_DIR/bin/$ARCH/util-linux/$file" ] && rm -f "$ROOT_DIR/bin/$ARCH/util-linux/$file"
 	done
-	rm -fr $ROOT_DIR/bin/$ARCH/util-linux/usr/include
-	rm -f $ROOT_DIR/bin/$ARCH/util-linux/usr/lib/*.la
-	rm -fr $ROOT_DIR/bin/$ARCH/util-linux/usr/lib/pkgconfig
-	rm -fr $ROOT_DIR/bin/$ARCH/util-linux/usr/share/bash-completion
-	rm -fr $ROOT_DIR/bin/$ARCH/util-linux/usr/share/doc
+	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/include
+	rm -f "$ROOT_DIR/bin/$ARCH/util-linux/"usr/lib/*.la
+	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/lib/pkgconfig
+	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/share/bash-completion
+	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/share/doc
 	cd ../../../..
+fi
+
+if [ -f packages.txt ]; then
+	cat packages.txt | (while read line; do
+		INIT_PKG_CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
+		INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
+		INIT_PKG_LIBS=""
+		case $line in
+			"#"*)	;;
+			"")	;;
+			*)	build_extra_package $line;;
+		esac
+	done)
 fi
 

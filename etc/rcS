@@ -11,3 +11,10 @@ mkdir -p /dev/pts
 mkdir -p /dev/shm
 mount -a
 
+echo "Setting hostname ..."
+[ -e /etc/hostname ] && hostname "`cat /etc/hostname`"
+
+for file in `ls /etc/rc.d/S*`; do
+	"$file" start
+done
+

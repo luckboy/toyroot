@@ -1,0 +1,36 @@
+#!/bin/sh
+
+. /etc/network.conf
+
+case "$1" in
+	start)
+		echo "Starting network ..."
+		ifconfig lo 127.0.0.0 netmask 255.0.0.0 up
+		if [ "$INTERFACE" != "" ]; then
+			if [ "$ADDRESS" != "" -a "$DHCP" != yes -a "$DHCP" != true ]; then
+				ifconfig "$INTERFACE" "$ADDRESS" netmask "$NETMASK" up
+				route add default gw "$GATEWAY"
+			else
+				ifconfig "$INTERFACE" up
+				dhcp -i "$INTERFACE" -p /var/run/dhcp.pid -s /etc/dhcp.script
+			fi
+		fi
+		echo -n > /etc/resolv.conf
+		[ -f /etc/resolv.conf.static ] && cat /etc/resolv.conf.static >> /etc/resolv.conf
+		[ -f /etc/resolv.conf.tail ] && cat /etc/resolv.conf.tail >> /etc/resolv.conf
+		;;
+	stop)
+		echo "Stopping network ..."
+		echo -n > /etc/resolv.conf
+		if [ "$INTERFACE" != "" ]; then
+			if [ -f /var/run/dhcp.pid ]; then
+				kill -15 `cat /var/run/dhcp.pid`
+				rm -f /var/run/dhcp.pid
+			fi
+			route del default
+			ifconfig "$INTERFACE" down
+		fi
+		ifconfig lo down
+		;;
+esac
+

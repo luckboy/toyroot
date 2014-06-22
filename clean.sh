@@ -31,6 +31,8 @@ if [ "$*" != "" ]; then
 		rm -fr build/*/$p
 		rm -fr bin/*/$p
 	done
+else
+	rm -fr build bin
 fi
-rm -fr build bin dist
+rm -fr dist
 

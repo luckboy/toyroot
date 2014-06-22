@@ -26,38 +26,40 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-LINUX_VERSION=3.13
+. ./kernel.txt
 
-GCC=${GCC:=gcc}
+GCC="${GCC:=gcc}"
 
 ROOT_DIR=`pwd`
 TARGET=`$GCC -dumpmachine`
 HOST=`gcc -dumpmachine`
 export ARCH=`$GCC -dumpmachine | cut -d - -f 1`
 
-case $ARCH in
-	arm)	PLATFORM=${PLATFORM:=vexpress};;
-	*)	PLATFORM=${PLATFORM:=$ARCH};;
+case "$ARCH" in
+	arm)	PLATFORM="${PLATFORM:=vexpress}";;
+	*)	PLATFORM="${PLATFORM:=$ARCH}";;
 esac
 
-mkdir -p src build/$ARCH/linux bin/$ARCH
+. ./functions.sh
 
-[ -f src/linux-$LINUX_VERSION.tar.xz ] || wget -P src http://www.kernel.org/pub/linux/kernel/v3.0/linux-$LINUX_VERSION.tar.xz
+download_source linux-$LINUX_VERSION.tar.xz $LINUX_DOWNLOAD_URL
 
-[ -d build/$ARCH/linux/linux-$LINUX_VERSION ] || tar Jxf src/linux-$LINUX_VERSION.tar.xz -C build/$ARCH/linux
+extract_and_patch_package linux linux-$LINUX_VERSION.tar.xz linux-$LINUX_VERSION
 
-if [ ! -d bin/$ARCH/linux ]; then
-	cd build/$ARCH/linux/linux-$LINUX_VERSION
-	if [ $TARGET != $HOST ]; then
-		export CROSS_COMPILE=$TARGET-
+mkdir -p "$ROOT_DIR/bin/$ARCH"
+
+if [ ! -d "$ROOT_DIR/bin/$ARCH/linux" ]; then
+	cd "build/$ARCH/linux/linux-$LINUX_VERSION"
+	if [ "$TARGET" != "$HOST" ]; then
+		export CROSS_COMPILE="$TARGET-"
 	fi
 	make clean
-	(make ${PLATFORM}_defconfig && make) || exit 1
-	mkdir -p $ROOT_DIR/bin/$ARCH/linux
-	[ -f arch/$ARCH/boot/Image ] && cp arch/$ARCH/boot/Image $ROOT_DIR/bin/$ARCH/linux
-	[ -f arch/$ARCH/boot/zImage ] && cp arch/$ARCH/boot/zImage $ROOT_DIR/bin/$ARCH/linux
-	[ -f arch/$ARCH/boot/bzImage ] && cp arch/$ARCH/boot/bzImage $ROOT_DIR/bin/$ARCH/linux
-	[ -f vmlinux ] && cp vmlinux $ROOT_DIR/bin/$ARCH/linux
+	(make "${PLATFORM}"_defconfig && make) || exit 1
+	mkdir -p "$ROOT_DIR/bin/$ARCH/linux"
+	[ -f "arch/$ARCH/boot/Image" ] && cp "arch/$ARCH/boot/Image" "$ROOT_DIR/bin/$ARCH/linux"
+	[ -f "arch/$ARCH/boot/zImage" ] && cp "arch/$ARCH/boot/zImage" "$ROOT_DIR/bin/$ARCH/linux"
+	[ -f "arch/$ARCH/boot/bzImage" ] && cp "arch/$ARCH/boot/bzImage" "$ROOT_DIR/bin/$ARCH/linux"
+	[ -f vmlinux ] && cp vmlinux "$ROOT_DIR/bin/$ARCH/linux"
 	cd ../../../..
 fi
 

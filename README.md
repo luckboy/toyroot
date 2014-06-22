@@ -9,9 +9,13 @@ linux distribution by invoke commands:
         ./rootfs.sh # generate root file system
         ./play.sh # run built system on qemu emulator
 
+The built system automatically configure network for the ethernet card. You can choose the static network
+configuration or the dynamic network configuration by the DHCP client. The configuration network is at
+the /etc/network.conf file.
+
 ## Packages
 
-The built system contains the following packages:
+The built system contains the following core packages:
 
   * musl
   * ncurses
@@ -21,6 +25,20 @@ The built system contains the following packages:
   * toybox
   * util-linux (with selected programs)
 
+You can choose packages by comment line of packages.txt. The packages.txt file contains the descriptions of
+extra packages. The extra packages:
+
+  * gzip
+  * bzip2
+  * tar
+  * less
+  * nano (editor)
+  * nvi (vi editor)
+  * openssl
+  * wget
+  * links (www browser)
+  * tnftp (ftp client)
+  
 ## Scripts
 
 This build system contains scripts:
@@ -92,8 +110,9 @@ Example:
 
 ## Cleaning 
 
-You can remove the building directories and root file systems. If you pass arguments, clean.sh just remove
-the specified packages from the building directory and the directory with packages. Usage of this script:
+You can remove the building directories and root file systems by invoke `./clean.sh`. If you pass arguments, 
+clean.sh just remove the specified packages from the building directory and the directory with packages. Usage of
+this script:
 
         ./clean.sh [<package> ...]
 

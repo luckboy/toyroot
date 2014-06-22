@@ -1,0 +1,12 @@
+diff -Naur old/gzip-1.6/lib/fseeko.c new/gzip-1.6/lib/fseeko.c
+--- old/gzip-1.6/lib/fseeko.c	2013-04-07 03:59:54.000000000 +0200
++++ new/gzip-1.6/lib/fseeko.c	2014-06-21 18:29:04.648945818 +0200
+@@ -100,7 +100,7 @@
+   if (fp->rp == fp->buf
+       && fp->wp == fp->buf)
+ #else
+-  #error "Please port gnulib fseeko.c to your platform! Look at the code in fpurge.c, then report this to bug-gnulib."
++  if (0)
+ #endif
+     {
+       /* We get here when an fflush() call immediately preceded this one (or

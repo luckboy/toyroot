@@ -1,0 +1,113 @@
+diff -Naur old/nvi-1.79/build/configure new/nvi-1.79/build/configure
+--- old/nvi-1.79/build/configure	1996-10-23 15:53:07.000000000 +0200
++++ new/nvi-1.79/build/configure	2014-06-21 20:23:37.792843786 +0200
+@@ -3627,27 +3627,27 @@
+ fi
+ echo "$ac_t""$vi_cv_revoke" 1>&6
+ 
+-echo $ac_n "checking for int type sprintf return value""... $ac_c" 1>&6
+-if eval "test \"`echo '$''{'vi_cv_sprintf_count'+set}'`\" = set"; then
+-  echo $ac_n "(cached) $ac_c" 1>&6
+-else
+-  if test "$cross_compiling" = yes; then
+-    { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
+-else
+-cat > conftest.$ac_ext <<EOF
+-#line 3639 "configure"
+-#include "confdefs.h"
+-main(){char buf[20]; exit(sprintf(buf, "XXX") != 3);}
+-EOF
+-eval $ac_link
+-if test -s conftest && (./conftest; exit) 2>/dev/null; then
+-  vi_cv_sprintf_count=yes
+-else
+-  vi_cv_sprintf_count=no
+-fi
+-fi
+-rm -fr conftest*
+-fi
++#echo $ac_n "checking for int type sprintf return value""... $ac_c" 1>&6
++#if eval "test \"`echo '$''{'vi_cv_sprintf_count'+set}'`\" = set"; then
++#  echo $ac_n "(cached) $ac_c" 1>&6
++#else
++#  if test "$cross_compiling" = yes; then
++#    { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
++#else
++#cat > conftest.$ac_ext <<EOF
++##line 3639 "configure"
++##include "confdefs.h"
++#main(){char buf[20]; exit(sprintf(buf, "XXX") != 3);}
++#EOF
++#eval $ac_link
++#if test -s conftest && (./conftest; exit) 2>/dev/null; then
++#  vi_cv_sprintf_count=yes
++#else
++#  vi_cv_sprintf_count=no
++#fi
++#fi
++#rm -fr conftest*
++#fi
+ 
+ if test "$vi_cv_sprintf_count" = no; then
+ 	cat >> confdefs.h <<\EOF
+diff -Naur old/nvi-1.79/build/Makefile.in new/nvi-1.79/build/Makefile.in
+--- old/nvi-1.79/build/Makefile.in	1996-10-23 15:43:38.000000000 +0200
++++ new/nvi-1.79/build/Makefile.in	2014-06-21 23:01:52.420702840 +0200
+@@ -74,20 +74,20 @@
+ 
+ transform=@program_transform_name@
+ 
+-install: all install_common
++install: all #install_common
+ 	@echo "Installing vi, ex, view: $(bindir) ..."
+ 	[ -d $(bindir) ] || \
+ 	    ($(mkdir) $(bindir) && $(chmod) $(dmode) $(bindir))
+ 	cd $(bindir) && $(rm) -f `echo vi | sed '$(transform)'`
+ 	$(cp) nvi $(bindir)/`echo vi | sed '$(transform)'`
+-	cd $(bindir) && [ -f $(strip) ] && \
++	cd $(bindir) && \
+ 	    $(strip) `echo vi | sed '$(transform)'`
+ 	cd $(bindir) && $(chmod) $(emode) `echo vi | sed '$(transform)'`
+ 	cd $(bindir) && $(rm) -f `echo ex | sed '$(transform)'`
+ 	cd $(bindir) && $(rm) -f `echo view | sed '$(transform)'`
+-	cd $(bindir) && $(ln) \
++	cd $(bindir) && $(ln) -s \
+ 		`echo vi | sed '$(transform)'` `echo ex | sed '$(transform)'`
+-	cd $(bindir) && $(ln) \
++	cd $(bindir) && $(ln) -s \
+ 		`echo vi | sed '$(transform)'` `echo view | sed '$(transform)'`
+ 	[ -d $(mandir) ] || \
+ 	    ($(mkdir) $(mandir) && $(chmod) $(dmode) $(mandir))
+@@ -100,9 +100,9 @@
+ 	cd $(mandir)/cat1 && $(chmod) $(fmode) `echo vi.0 | sed '$(transform)'`
+ 	cd $(mandir)/cat1 && $(rm) -f `echo ex.0 | sed '$(transform)'`
+ 	cd $(mandir)/cat1 && $(rm) -f `echo view.0 | sed '$(transform)'`
+-	cd $(mandir)/cat1 && $(ln) \
++	cd $(mandir)/cat1 && $(ln) -s \
+ 	    `echo vi.0 | sed '$(transform)'` `echo ex.0 | sed '$(transform)'`
+-	cd $(mandir)/cat1 && $(ln) \
++	cd $(mandir)/cat1 && $(ln) -s \
+ 	    `echo vi.0 | sed '$(transform)'` `echo view.0 | sed '$(transform)'`
+ 	[ -d $(mandir)/man1 ] || \
+ 	    ($(mkdir) $(mandir)/man1 && $(chmod) $(dmode) $(mandir)/man1)
+@@ -112,9 +112,9 @@
+ 	cd $(mandir)/man1 && $(chmod) $(fmode) `echo vi.1 | sed '$(transform)'`
+ 	cd $(mandir)/man1 && $(rm) -f `echo ex.1 | sed '$(transform)'`
+ 	cd $(mandir)/man1 && $(rm) -f `echo view.1 | sed '$(transform)'`
+-	cd $(mandir)/man1 && $(ln) \
++	cd $(mandir)/man1 && $(ln) -s \
+ 	    `echo vi.1 | sed '$(transform)'` `echo ex.1 | sed '$(transform)'`
+-	cd $(mandir)/man1 && $(ln) \
++	cd $(mandir)/man1 && $(ln) -s \
+ 	    `echo vi.1 | sed '$(transform)'` `echo view.1 | sed '$(transform)'`
+ 
+ cat=	dutch english french german ru_SU.KOI8-R spanish swedish
+@@ -139,7 +139,7 @@
+ 	    cd $(datadir)/vi/catalog && $(chmod) $(fmode) *)
+ 	@echo "Installing Perl scripts: $(datadir)/vi/perl ..."
+ 	$(mkdir) $(datadir)/vi/perl && $(chmod) $(dmode) $(datadir)/vi/perl
+-	[ -f VI.pm ] && $(cp) VI.pm $(datadir)/vi/perl && \
++	([ -f VI.pm ] && $(cp) VI.pm $(datadir)/vi/perl && \
+ 	    cd $(datadir)/vi/perl && $(chmod) $(fmode) VI.pm)
+ 	(cd $(srcdir)/perl_scripts && $(cp) *.pl $(datadir)/vi/perl && \
+ 	    cd $(datadir)/vi/perl && $(chmod) $(fmode) *.pl)

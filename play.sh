@@ -31,17 +31,17 @@ ARCH=$1
 
 case "$ARCH" in
 	arm)
-		MACHINE=$2
+		MACHINE="$2"
 		[ "$MACHINE" = "" ] && MACHINE=vexpress-a9
 		qemu-system-arm -M $MACHINE -drive file=dist/arm/rootfs.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0"
 		;;
 	x86_64)
-		MACHINE=$2
+		MACHINE="$2"
 		[ "$MACHINE" = "" ] && MACHINE=pc-1.0
-		qemu-system-x86_64 -M $MACHINE -hda dist/x86_64/rootfs.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=0"
+		qemu-system-x86_64 -M $MACHINE -hda dist/x86_64/rootfs.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=0" -netdev user,id=mynet -device e1000,netdev=mynet
 		;;
 	*)
-		echo "Unsupported architecture." >&2
+		echo "Unsupported architecture" >&2
 		exit 1
 		;;
 esac

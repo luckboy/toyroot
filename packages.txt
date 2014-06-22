@@ -1,0 +1,12 @@
+# <type>	<name>		<version>	<extension>	<download url>					<src_format>		<build dir format>
+pkg		gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
+pkg		bzip2		1.0.6		tar.gz		http://www.bzip.org/1.0.6
+pkg		tar		1.27		tar.xz		http://ftp.gnu.org/gnu/tar
+pkg		less		458		tar.gz		http://www.greenwoodsoftware.com/less
+pkg		nano		2.2.6		tar.gz		http://www.nano-editor.org/dist/v2.2
+pkg		nvi		1.79		tar.gz		https://sites.google.com/a/bostic.com/keithbostic/files
+libpkg		openssl		1.0.1h		tar.gz		https://www.openssl.org/source
+pkg		wget		1.15		tar.xz		http://ftp.gnu.org/gnu/wget
+pkg		links		2.8		tar.bz2		http://links.twibright.com/download
+pkg		tnftp		20130505	tar.gz		ftp://ftp.netbsd.org/pub/NetBSD/misc/lukemftp
+

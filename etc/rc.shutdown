@@ -1,5 +1,9 @@
 #!/bin/sh
-echo "Shutdowning Toyout ..."
+echo "Shutdowning Toyroot ..."
+
+for file in `ls -r /etc/rc.d/K*`; do
+	"$file" stop
+done
 
 echo "Terminating all processes ..."
 killall5 -15
