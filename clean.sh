@@ -26,13 +26,22 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-if [ "$*" != "" ]; then
-	for p in $*; do
-		rm -fr build/*/$p
-		rm -fr bin/*/$p
-	done
-else
-	rm -fr build bin
+ONLY_DIST=false
+case "$1" in
+	--only-dist)
+		ONLY_DIST=true
+		shift
+		;;
+esac
+if [ $ONLY_DIST != true ]; then
+	if [ "$*" != "" ]; then
+		for p in $*; do
+			rm -fr build/*/$p
+			rm -fr bin/*/$p
+		done
+	else
+		rm -fr build bin
+	fi
 fi
 rm -fr dist
 

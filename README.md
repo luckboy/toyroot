@@ -111,7 +111,8 @@ Example:
 ## Cleaning 
 
 You can remove the building directories and root file systems by invoke `./clean.sh`. If you pass arguments, 
-clean.sh just remove the specified packages from the building directory and the directory with packages. Usage of
+clean.sh just removes the specified packages from the building directory and the directory with packages. If you
+uses the `--only-dist` option, clean.sh just removes the dist directory. Usage of
 this script:
 
         ./clean.sh [<package> ...]
