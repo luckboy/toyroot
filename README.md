@@ -80,9 +80,9 @@ Usage of this script:
         
 Options of this scirpt:
 
-        --custom-config                 compile with the custom configuration. If the custom configuration is
-                                        nonexistent, this script invokes the manual configuration with the 
-                                        default settings.
+        --custom-config                 compile with the custom configuration. If the custom 
+                                        configuration is nonexistent, this script invokes the manual 
+                                        configuration with the default settings.
         --only-custom-config            same as --custom-config but without the default settings.
         --force-menuconfig              force the manual configuration.
 
@@ -104,7 +104,8 @@ Usage of this script:
 
 Options of this script:
 
-        --pkg-list-file[=<list file>]   add packages to compilation from a list file (default: package-list.txt).
+        --pkg-list-file[=<list file>]   add packages to compilation from a list file (default: 
+                                        package-list.txt).
         --all-pkgs                      compile all packages.
         --no-extra-pkgs                 just compile non-extra packages.
 
