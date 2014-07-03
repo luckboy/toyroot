@@ -26,18 +26,26 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+PKGS=""
 ONLY_DIST=false
-case "$1" in
-	--only-dist)
-		ONLY_DIST=true
-		shift
-		;;
-esac
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--only-dist)
+			ONLY_DIST=true
+			;;
+		*)
+			PKGS="$PKGS $1"
+			;;
+	esac
+	shift
+done
 if [ $ONLY_DIST != true ]; then
-	if [ "$*" != "" ]; then
-		for p in $*; do
-			rm -fr build/*/$p
-			rm -fr bin/*/$p
+	if [ "$PKGS" != "" ]; then
+		for p in $PKGS; do
+			rm -fr build/*/"$p"
+			rm -fr bin/*/"$p"
+			rm -fr bin/*/"$p"_*
+			rm -f bin/*/"$p".nonextra
 		done
 	else
 		rm -fr build bin

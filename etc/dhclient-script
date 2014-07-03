@@ -1,0 +1,65 @@
+#!/bin/sh
+
+first() {
+	echo $1
+}
+
+case "$reason" in
+	PREINIT)
+		ifconfig "$interface" up
+		sleep 1
+		;;
+	BOUND|RENEW|REBIND|REBOOT|TIMEOUT)
+		case "$reason" in
+			REBIND|RENEW)
+				if [ "$old_ip_address" != "" -a  "$old_ip_address" != "$new_ip_address" ]; then
+					# Clears ARP table.
+					ifconfig "$interface" down
+					ifconfig "$interface" up
+				fi
+				;;
+		esac
+		if [ "$new_subnet_mask" = "" ]; then
+			ifconfig "$interface" "$new_ip_address"
+		else
+			ifconfig "$interface" "$new_ip_address" netmask "$new_subnet_mask"
+		fi
+		case "$reason" in
+			TIMEOUT)
+				if ping -c 1 -n -q "`first $new_routers`"; then
+					echo -n
+				else
+					echo -n > /etc/resolv.conf
+					ifconfig "$interface" down
+					exit 1
+				fi
+				;;
+		esac
+		case "$reason" in
+			RENEW|REBIND)
+				if [ "$old_routers" != "" ]; then
+					for router in $old_routers; do
+						route del defualt gw "$router"
+					done
+				fi
+				;;
+		esac
+		if [ "$new_routers" != "" ]; then
+			for router in $new_routers; do
+				route add default gw "$router" dev "$interface"
+			done
+		fi
+		echo -n > /etc/resolv.conf
+		if [ "$new_domain_name_servers" != "" ]; then
+			for name_server in $new_domain_name_servers; do
+				echo "nameserver $name_server" >> /etc/resolv.conf
+			done
+		fi
+		[ -f /etc/resolv.conf.tail ] && cat /etc/resolv.conf.tail >> /etc/resolv.conf
+		;;
+	EXPIRE|FAIL|STOP|RELEASE)
+		echo -n > /etc/resolv.conf
+		ifconfig "$interface" down
+		;;
+esac
+exit 0

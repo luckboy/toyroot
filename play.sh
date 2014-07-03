@@ -33,7 +33,7 @@ case "$ARCH" in
 	arm)
 		MACHINE="$2"
 		[ "$MACHINE" = "" ] && MACHINE=vexpress-a9
-		qemu-system-arm -M $MACHINE -drive file=dist/arm/rootfs.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0"
+		qemu-system-arm -M $MACHINE -drive file=dist/arm/rootfs.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo"
 		;;
 	x86_64)
 		MACHINE="$2"

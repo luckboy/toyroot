@@ -1,0 +1,21 @@
+diff -Naur old/uClibc++-0.2.4/include/unwind-cxx.h new/uClibc++-0.2.4/include/unwind-cxx.h
+--- old/uClibc++-0.2.4/include/unwind-cxx.h	2012-05-25 23:15:31.000000000 +0200
++++ new/uClibc++-0.2.4/include/unwind-cxx.h	2014-07-03 11:04:05.507578746 +0200
+@@ -172,6 +172,9 @@
+ // These are explicitly GNU C++ specific.
+ 
+ // This is the exception class we report -- "GNUCC++\0".
++#ifdef __ARM_EABI_UNWINDER__
++const _Unwind_Exception_Class __gxx_exception_class = "GNUCC++";
++#else
+ const _Unwind_Exception_Class __gxx_exception_class
+ = ((((((((_Unwind_Exception_Class) 'G' 
+ 	 << 8 | (_Unwind_Exception_Class) 'N')
+@@ -181,6 +184,7 @@
+      << 8 | (_Unwind_Exception_Class) '+')
+     << 8 | (_Unwind_Exception_Class) '+')
+    << 8 | (_Unwind_Exception_Class) '\0');
++#endif
+ 
+ // GNU C++ personality routine, Version 0.
+ extern "C" _Unwind_Reason_Code __gxx_personality_v0

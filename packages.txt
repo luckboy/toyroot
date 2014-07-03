@@ -1,12 +1,24 @@
-# <type>	<name>		<version>	<extension>	<download url>					<src_format>		<build dir format>
-pkg		gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
-pkg		bzip2		1.0.6		tar.gz		http://www.bzip.org/1.0.6
-pkg		tar		1.27		tar.xz		http://ftp.gnu.org/gnu/tar
-pkg		less		458		tar.gz		http://www.greenwoodsoftware.com/less
-pkg		nano		2.2.6		tar.gz		http://www.nano-editor.org/dist/v2.2
-pkg		nvi		1.79		tar.gz		https://sites.google.com/a/bostic.com/keithbostic/files
-libpkg		openssl		1.0.1h		tar.gz		https://www.openssl.org/source
-pkg		wget		1.15		tar.xz		http://ftp.gnu.org/gnu/wget
-pkg		links		2.8		tar.bz2		http://links.twibright.com/download
-pkg		tnftp		20130505	tar.gz		ftp://ftp.netbsd.org/pub/NetBSD/misc/lukemftp
-
+# <name>	<version>	<extension>	<download url>						<src_format>	<build dir format>
+iputils
+dhcp
+util-linux
+shadow
+gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
+bzip2		1.0.6		tar.gz		http://www.bzip.org/1.0.6
+xz		5.0.5		tar.xz		http://tukaani.org/xz
+tar		1.27		tar.xz		http://ftp.gnu.org/gnu/tar
+less		458		tar.gz		http://www.greenwoodsoftware.com/less
+nano		2.2.6		tar.gz		http://www.nano-editor.org/dist/v2.2
+nvi		1.79		tar.gz		https://sites.google.com/a/bostic.com/keithbostic/files
+microperl	5.14.4		tar.gz		http://www.cpan.org/src/5.0				perl-%v.%e	perl-%v
+openssl		1.0.1h		tar.gz		https://www.openssl.org/source
+wget		1.15		tar.xz		http://ftp.gnu.org/gnu/wget
+links		2.8		tar.bz2		http://links.twibright.com/download
+tnftp		20130505	tar.gz		ftp://ftp.netbsd.org/pub/NetBSD/misc/lukemftp
+uClibc++
+groff		1.21		tar.gz		http://ftp.gnu.org/gnu/groff
+findutils	4.4.2		tar.gz		http://ftp.gnu.org/pub/gnu/findutils
+sed		4.2		tar.gz		http://ftp.gnu.org/gnu/sed
+awk 		-		tar.gz		http://www.cs.princeton.edu/~bwk/btl.mirror		%p.%e		dummy	
+man 		1.6g		tar.gz		http://fossies.org/linux/misc
+texinfo		5.2		tar.xz		http://ftp.gnu.org/gnu/texinfo

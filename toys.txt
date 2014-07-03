@@ -8,8 +8,15 @@ SYSVINIT_VERSION=2.88dsf
 SUSVINIT_DOWNLOAD_URL=http://download.savannah.gnu.org/releases/sysvinit
 DASH_VERSION=0.5.7
 DASH_DOWNLOAD_URL=http://gondor.apana.org.au/~herbert/dash/files
+IPUTILS_VERSION=s20140519
+IPUTILS_DOWNLOAD_URL=https://github.com/iputils/iputils/archive
+DHCP_VERSION=4.1-ESV-R9
+DHCP_DOWNLOAD_URL=http://ftp.isc.org/isc/dhcp/4.1-ESV-R9/dhcp-4.1-ESV-R9.tar.gz
 TOYBOX_VERSION=0.4.8
 TOYBOX_DOWNLOAD_URL=http://www.landley.net/toybox/downloads
 UTIL_LINUX_VERSION=2.24.2
 UTIL_LINUX_DOWNLOAD_URL=https://www.kernel.org/pub/linux/utils/util-linux/v2.24
-
+UCLIBCXX_VERSION=0.2.4
+UCLIBCXX_DOWNLOAD_URL=http://cxx.uclibc.org/src
+SHADOW_VERSION=4.2.1
+SHADOW_DOWNLOAD_URL=http://pkg-shadow.alioth.debian.org/releases

@@ -1,0 +1,12 @@
+diff -Naur old/musl-1.0.3/src/legacy/getpass.c new/musl-1.0.3/src/legacy/getpass.c
+--- old/musl-1.0.3/src/legacy/getpass.c	2014-06-07 00:46:44.000000000 +0200
++++ new/musl-1.0.3/src/legacy/getpass.c	2014-06-30 17:24:23.411512550 +0200
+@@ -33,6 +33,8 @@
+ 
+ 	tcsetattr(fd, TCSAFLUSH, &s);
+ 
++	fputs("\n", stderr);
++	fflush(stderr);
+ 	if (fd > 2) close(fd);
+ 
+ 	return password;

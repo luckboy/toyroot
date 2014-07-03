@@ -1,0 +1,17 @@
+diff -Naur old/musl-1.0.3/src/stdio/__sprintf_chk.c new/musl-1.0.3/src/stdio/__sprintf_chk.c
+--- old/musl-1.0.3/src/stdio/__sprintf_chk.c	1970-01-01 01:00:00.000000000 +0100
++++ new/musl-1.0.3/src/stdio/__sprintf_chk.c	2014-06-27 15:58:19.917551710 +0200
+@@ -0,0 +1,13 @@
++#include <stdarg.h>
++#include <stdio.h>
++#include "atomic.h"
++
++int __sprintf_chk(char *s, int flag, size_t slen, const char *fmt, ...)
++{
++	va_list ap;
++	va_start(ap, fmt);
++	int ret = vsnprintf(s, slen, fmt, ap);
++	if(ret >= 0 && (size_t) ret >= slen) a_crash();
++	va_end(ap);
++	return ret;
++}

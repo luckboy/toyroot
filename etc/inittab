@@ -3,9 +3,8 @@ si::sysinit:/etc/rcS
 ha:0:wait:/etc/rc.shutdown halt
 re:6:wait:/etc/rc.shutdown reboot
 ca::ctrlaltdel:/sbin/shutdown -t 5 -r now
-1:12345:respawn:/sbin/getty 9600 tty1
-2:12345:respawn:/sbin/getty 9600 tty2
-3:12345:respawn:/sbin/getty 9600 tty3
-4:12345:respawn:/sbin/getty 9600 tty4
-5:12345:respawn:/sbin/getty 9600 tty5
-
+1:12345:respawn:/sbin/getty 38400 tty1
+2:12345:respawn:/sbin/getty 38400 tty2
+3:12345:respawn:/sbin/getty 38400 tty3
+4:12345:respawn:/sbin/getty 38400 tty4
+5:12345:respawn:/sbin/getty 38400 tty5

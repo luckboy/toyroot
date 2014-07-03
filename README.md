@@ -1,8 +1,8 @@
 # Toyroot 
 
-This build system is build system to build small linux distribution. This distribution is based  musl and toybox.
-This distribution was compiled on ARM and x86_64 and tested on qemu emulator. You can build and run your small
-linux distribution by invoke commands:
+This build system is build system to build small linux distribution. This distribution is based musl C library and
+toybox. This distribution can be compiled on ARM and x86_64 and tested on qemu emulator. You can build and run your
+small linux distribution by invoke commands:
 
         ./kernel.sh # compile kernel
         ./toys.sh # compile programs (toys)
@@ -21,23 +21,25 @@ The built system contains the following core packages:
   * ncurses
   * libedit
   * sysvinit
+  * iputils (ping and ping6)
+  * dchp-client (DHCP client)
   * dash
   * toybox
-  * util-linux (with selected programs)
+  * util-linux-mount (mount and umount)
+  * uClibc++-build (only to build)
+  * shadow-login (login)
 
-You can choose packages by comment line of packages.txt. The packages.txt file contains the descriptions of
-extra packages. The extra packages:
+You can choose packages by editing of the package_list.txt file. The packages.txt file contains the descriptions
+of all extra packages which may be in built system.
 
-  * gzip
-  * bzip2
-  * tar
-  * less
-  * nano (editor)
-  * nvi (vi editor)
-  * openssl
-  * wget
-  * links (www browser)
-  * tnftp (ftp client)
+## Package suffixes
+
+Any package can have the additional packages with the suffixes. The package suffix specifies the type of
+the additional package. The package suffixes:
+
+  * man - manuals and infos
+  * doc - documentation
+  * dev - headers and static libraries
   
 ## Scripts
 
@@ -61,6 +63,7 @@ After compilation, this directory also contains the subdirectories:
   * src - directory of downloaded files
   * build - building directory
   * bin - directory of binary packages
+  * kernel_config -  directory of kernel configurations
 
 After generating of root file system, the directory also contains the subdirectory:
 
@@ -69,9 +72,19 @@ After generating of root file system, the directory also contains the subdirecto
 ## Compilation of kernel
 
 You can compile the kernel by invoke `./kernel.sh`. This script will automatically download the kernel source
-and then compile it. Usage of this script:
+and then compile it.
+
+Usage of this script:
   
-        [GCC=<c compiler>] [PLATFORM=<platform for linux>] ./kernel.sh
+        [GCC=<c compiler>] [PLATFORM=<platform for linux>] ./kernel.sh [<option> ...]
+        
+Options of this scirpt:
+
+        --custom-config                 compile with the custom configuration. If the custom configuration is
+                                        nonexistent, this script invokes the manual configuration with the 
+                                        default settings.
+        --only-custom-config            same as --custom-config but without the default settings.
+        --force-menuconfig              force the manual configuration.
 
 Example:
 
@@ -79,10 +92,21 @@ Example:
 
 ## Compilation of programs (toys)
     
-If you want compile the programs, you can do it by invoke `./toys.sh`. Also this script automatically download
-the sources of the programs. Usage of this script:
+If you want compile the packages, you can do it by invoke `./toys.sh`. Also this script automatically download
+the sources of the packages. This script compiles the non-extra packages and the extra packages from the
+package_list.txt file. If you doesn't want compile the extra packages form this list file, you can pass the extra
+packages as the arguments and/or the package list files with them. You also can compile only non-extra packages 
+or all packages.
+
+Usage of this script:
     
-        [GCC=<c compiler>] ./toys.sh
+        [GCC=<c compiler>] ./toys.sh [<option> ...] [<package> ...]
+
+Options of this script:
+
+        --pkg-list-file[=<list file>]   add packages to compilation from a list file (default: package-list.txt).
+        --all-pkgs                      compile all packages.
+        --no-extra-pkgs                 just compile non-extra packages.
 
 Example:
 
@@ -90,9 +114,26 @@ Example:
 
 ## Generating of root file system
 
-You can generate the root file system by invoke `./rootfs.sh`. Usage of this script:
+You can generate the root file system by invoke `./rootfs.sh`. This script generates the root file system with
+the non-extra packages and the extra packages from the package-list.txt file. If you doesn't want generate built
+system without the extra packages from the package_list.txt file, you can pass the extra packages as the
+arguments and/or the package list files with them. You also can generate the root file system with only or all
+packages.
 
-        [ARCH=<architecture>] ./rootfs.sh
+Usage of this script:
+
+        [ARCH=<architecture>] ./rootfs.sh [<option> ...] [<package> ...]
+
+Options of this script:
+
+        --pkg-list-file[=<list file>]   add packages to the root file system from a list file (default:
+                                        package-list.txt).
+        --all-pkgs                      generate the root file system with all packages.
+        --no-extra-pkgs                 generate the root file system with only non-extra packages.
+        --pkg-suffixes=<suffix>,...     add additional packages with specified suffixes onto the root
+                                        file system.
+        --fs-size=<size>                specify the size of the root file system in blocks.
+        --fs-inodes=<nodes>             specify the number of i-nodes of the root file system. 
 
 Example:
 
@@ -100,7 +141,9 @@ Example:
 
 ## Running of system
 
-If you want run your system on qemu emulator, you can do it by invoke `./play.sh`. Usage of this script:
+If you want run your system on qemu emulator, you can do it by invoke `./play.sh`.
+
+Usage of this script:
 
         ./play.sh <architecture> [<machine for qemu>]
     
@@ -111,9 +154,13 @@ Example:
 ## Cleaning 
 
 You can remove the building directories and root file systems by invoke `./clean.sh`. If you pass arguments, 
-clean.sh just removes the specified packages from the building directory and the directory with packages. If you
-uses the `--only-dist` option, clean.sh just removes the dist directory. Usage of
-this script:
+`clean.sh` just removes the specified packages from the building directory and the directory with packages. If
+you uses the `--only-dist` option, `clean.sh` just removes the dist directory.
 
-        ./clean.sh [<package> ...]
+Usage of this script:
 
+        ./clean.sh [<option> ...] [<package> ...]
+
+Options of this script:
+
+        --only-dist                     remove just the dist directory.

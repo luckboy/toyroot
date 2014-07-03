@@ -32,18 +32,58 @@ ROOT_FS_IMG="dist/$ARCH/rootfs.img"
 
 . ./functions.sh
 
+PKGS=""
+ALL_PKGS=false
+NO_EXTRA_PKGS=false
+PKG_SUFFIXES=""
+FS_SIZE=65536
+FS_INODES=32768
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--pkg-list-file)
+			PKGS="$PKGS `cat package_list.txt`"
+			;;
+		--pkg-list-file=*)
+			PKG_LIST_FILE="`echo "$1" | sed 's/^[^=]*=//'`"
+			PKGS="$PKGS `cat "$PKG_LIST_FILE"`"
+			;;
+		--all-pkgs)
+			ALL_PKGS=true
+			;;
+		--no-extra-pkgs)
+			NO_EXTRA_PKGS=true
+			;;
+		--pkg-suffixes=*)
+			PKG_SUFFIXES="`echo "$1" | sed 's/^[^=]*=//'`"
+			;;
+		--fs-size=*)
+			FS_SIZE="`echo "$1" | sed 's/^[^=]*=//'`"
+			;;
+		--fs-inodes=*)
+			FS_INODES="`echo "$1" | sed 's/^[^=]*=//'`"
+			;;
+		*)
+			PKGS="$PKGS $1"
+			;;
+	esac
+	shift
+done
+[ "$PKGS" = "" -a $ALL_PKGS != true ] && PKGS="$PKGS `cat package_list.txt`"
+PKG_SUFFIXES="`echo "$PKG_SUFFIXES" | sed 's/,/ /g'`"
+
 mkdir -p "$ROOT_FS_DIR"
-cp -drP etc/ "$ROOT_FS_DIR"
+cp -drp etc/ "$ROOT_FS_DIR"
 chmod 755 "$ROOT_FS_DIR/etc/rcS"
 chmod 755 "$ROOT_FS_DIR/etc/rc.shutdown"
 chmod 755 "$ROOT_FS_DIR/etc/init.d/network"
 ln -s ../init.d/network "$ROOT_FS_DIR/etc/rc.d/S10network"
 ln -s ../init.d/network "$ROOT_FS_DIR/etc/rc.d/K10network"
-chmod 755 "$ROOT_FS_DIR/etc/dhcp.script"
+chmod 600 "$ROOT_FS_DIR/etc/shadow"
 mkdir -p "$ROOT_FS_DIR/dev"
 mkdir -p "$ROOT_FS_DIR/proc"
 mkdir -p "$ROOT_FS_DIR/sys"
 mkdir -p "$ROOT_FS_DIR/tmp"
+mkdir -p "$ROOT_FS_DIR/var/db"
 mkdir -p "$ROOT_FS_DIR/var/run"
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
@@ -52,33 +92,20 @@ case "$ARCH" in
 	*)	ln -sf sda1 "$ROOT_FS_DIR/dev/root";;
 esac
 echo -n > "$ROOT_FS_DIR/etc/mtab"
+mkdir -p "$ROOT_FS_DIR/sbin"
+chmod 755 "$ROOT_FS_DIR/etc/dhclient-script"
+ln -sf /etc/dhclient-script "$ROOT_FS_DIR/sbin/dhclient-script"
 
-mkdir -p "$ROOT_FS_DIR/lib"
-cp -dP "bin/$ARCH/musl/lib"/*.so "$ROOT_FS_DIR/lib"
-echo /lib:/usr/lib > "$ROOT_FS_DIR/etc/ld-musl-$ARCH.path"
-ln -s libc.so "$ROOT_FS_DIR/lib/ld-musl-$ARCH.so.1"
-
-for libpkg in ncurses libedit; do
-	[ -d "bin/$ARCH/$libpkg/lib" ] && mkdir -p "$ROOT_FS_DIR/lib" && cp -drP "bin/$ARCH/$libpkg/lib"/lib*.so "bin/$ARCH/$libpkg/lib"/lib*.so.* "$ROOT_FS_DIR/lib"
-	[ -d "bin/$ARCH/$libpkg/usr/lib" ] && mkdir -p "$ROOT_FS_DIR/usr/lib" && cp -drP "bin/$ARCH/$libpkg/usr/lib"/lib*.so "bin/$ARCH/$libpkg/usr/lib"/lib*.so.* "$ROOT_FS_DIR/usr/lib"
-done
-mkdir -p "$ROOT_FS_DIR/usr/share"
-cp -drP "bin/$ARCH/ncurses/usr/share"/* "$ROOT_FS_DIR/usr/share"
-
-for pkg in sysvinit dash toybox util-linux; do
-	cp -drP "bin/$ARCH/$pkg"/* "$ROOT_FS_DIR"
-done
-ln -sf dash "$ROOT_FS_DIR/bin/sh"
-
-if [ -f packages.txt ]; then
-	cat packages.txt | (while read line; do
-		case $line in
-			"#"*)	;;
-			"")	;;
-			*)	install_extra_package $line;;
-		esac
-	done)
+NX_PKG_ROOT_DIR="$ROOT_FS_DIR"
+install_non_extra_packages
+if [ "$PKG_SUFFIXES" != "" ]; then
+	for sfx in $PKG_SUFFIXES; do
+		install_non_extra_packages_with_suffix "$sfx"
+	done
 fi
 
-genext2fs -N 16386 -b 32768 -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"
+PKG_ROOT_DIR="$ROOT_FS_DIR"
+process_extra_packages install_extra_package
+install_all_infos
 
+genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"

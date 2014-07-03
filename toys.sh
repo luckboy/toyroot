@@ -29,11 +29,13 @@
 . ./toys.txt
 
 GCC="${GCC:=gcc}"
+GCC_CFLAGS="${CFLAGS:=-Os}"
 
-ROOT_DIR=`pwd`
-TARGET=`$GCC -dumpmachine`
-HOST=`gcc -dumpmachine`
-ARCH=`$GCC -dumpmachine | cut -d - -f 1`
+GXX="`echo "$GCC" | sed -e s/gcc$/g++/`"
+ROOT_DIR="`pwd`"
+TARGET="`$GCC -dumpmachine`"
+HOST="`gcc -dumpmachine`"
+ARCH="`$GCC -dumpmachine | cut -d - -f 1`"
 STRIP=strip
 INCLUDE_DIR=/usr/include
 if [ "$TARGET" != "$HOST" ]; then
@@ -46,135 +48,271 @@ ASM_GENERIC_INCLUDE_DIR="$INCLUDE_DIR/asm-generic"
 LINUX_INCLUDE_DIR="$INCLUDE_DIR/linux"
 
 MUSL_GCC="$ROOT_DIR/bin/$ARCH/musl/bin/musl-gcc"
+GXX_UC="$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/bin/g++-uc"
+
+PKGS=""
+ALL_PKGS=false
+NO_EXTRA_PKGS=false
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--pkg-list-file)
+			PKGS="$PKGS `cat package_list.txt`"
+			;;
+		--pkg-list-file=*)
+			PKG_LIST_FILE="`echo "$1" | sed 's/^[^=]*=//'`"
+			PKGS="$PKGS `cat "$PKG_LIST_FILE"`"
+			;;
+		--all-pkgs)
+			ALL_PKGS=true
+			;;
+		--no-extra-pkgs)
+			NO_EXTRA_PKGS=true
+			;;
+		*)
+			PKGS="$PKGS $1"
+			;;
+	esac
+	shift
+done
+[ "$PKGS" = "" -a $ALL_PKGS != true ] && PKGS="$PKGS `cat package_list.txt`"
 
 . ./functions.sh
 
 export REALGCC="$GCC"
+export WRAPPER_INCLUDEDIR="-I$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/include"
+export WRAPPER_LIBDIR="-L$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/lib"
 
 download_source musl-$MUSL_VERSION.tar.gz $MUSL_DOWNLOAD_URL
 download_source ncurses-$NCURSES_VERSION.tar.gz $NCURSES_DOWNLOAD_URL
 download_source libedit-$LIBEDIT_VERSION.tar.gz $LIBEDIT_DOWNLOAD_URL
 download_source sysvinit-$SYSVINIT_VERSION.tar.bz2 $SYSVINIT_DOWNLOAD_URL
 download_source dash-$DASH_VERSION.tar.gz $DASH_DOWNLOAD_URL
+download_source iputils-$IPUTILS_VERSION.tar.gz $IPUTILS_DOWNLOAD_URL $IPUTILS_VERSION.tar.gz
+download_source dhcp-$DHCP_VERSION.tar.gz $DHCP_DOWNLOAD_URL
 download_source toybox-$TOYBOX_VERSION.tar.bz2 $TOYBOX_DOWNLOAD_URL
-download_source util-linux-$UTIL_LINUX_VERSION.tar.xz $UTIL_DOWNLOAD_URL
+download_source util-linux-$UTIL_LINUX_VERSION.tar.xz $UTIL_LINUX_DOWNLOAD_URL
+download_source uClibc++-$UCLIBCXX_VERSION.tar.xz $UCLIBCXX_DOWNLOAD_URL
+download_source shadow-$SHADOW_VERSION.tar.xz $SHADOW_DOWNLOAD_URL
 
 extract_and_patch_package musl musl-$MUSL_VERSION.tar.gz musl-$MUSL_VERSION
 extract_and_patch_package ncurses ncurses-$NCURSES_VERSION.tar.gz ncurses-$NCURSES_VERSION
 extract_and_patch_package libedit libedit-$LIBEDIT_VERSION.tar.gz libedit-$LIBEDIT_VERSION
 extract_and_patch_package sysvinit sysvinit-$SYSVINIT_VERSION.tar.bz2 sysvinit-$SYSVINIT_VERSION
 extract_and_patch_package dash dash-$DASH_VERSION.tar.gz dash-$DASH_VERSION
+extract_and_patch_package iputils iputils-$IPUTILS_VERSION.tar.gz iputils-$IPUTILS_VERSION
+extract_and_patch_package dhcp dhcp-$DHCP_VERSION.tar.gz dhcp-$DHCP_VERSION
 extract_and_patch_package toybox toybox-$TOYBOX_VERSION.tar.bz2 toybox-$TOYBOX_VERSION
 extract_and_patch_package util-linux util-linux-$UTIL_LINUX_VERSION.tar.xz util-linux-$UTIL_LINUX_VERSION
+extract_and_patch_package uClibc++ uClibc++-$UCLIBCXX_VERSION.tar.xz uClibc++-$UCLIBCXX_VERSION
+extract_and_patch_package shadow shadow-$SHADOW_VERSION.tar.xz shadow-$SHADOW_VERSION
 
 mkdir -p "$ROOT_DIR/bin/$ARCH"
 
 if [ ! -d "$ROOT_DIR/bin/$ARCH/musl" ]; then
 	cd "build/$ARCH/musl/musl-$MUSL_VERSION"
 	[ -f Makefile ] && make clean
-	(CC="$GCC" LDFLAGS=-s ./configure --prefix="$ROOT_DIR/bin/$ARCH/musl" "$TARGET" && make install) || exit 1
+	(CC="$GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s ./configure --prefix="$ROOT_DIR/bin/$ARCH/musl" "$TARGET" && make install) || exit 1
 	ln -sf $ASM_INCLUDE_DIR $ASM_GENERIC_INCLUDE_DIR $LINUX_INCLUDE_DIR "$ROOT_DIR/bin/$ARCH/musl/include"
 	cd ../../../..
+	echo -n > "bin/$ARCH/musl.nonextra"
 fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/ncurses" ]; then
 	cd "build/$ARCH/ncurses/ncurses-$NCURSES_VERSION"
 	[ -f Makefile ] && make clean
-	(CC="$MUSL_GCC" LDFLAGS=-s ./configure --target=$TARGET --host="$TARGET" --prefix=/usr --with-shared --without-debug --without-cxx --without-cxx-binding --without-ada --with-normal && make install DESTDIR="$ROOT_DIR/bin/$ARCH/ncurses") || exit 1
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s ./configure --target="$TARGET" --host="$TARGET" --prefix=/usr --with-shared --without-debug --without-cxx --without-cxx-binding --without-ada --with-normal && make install DESTDIR="$ROOT_DIR/bin/$ARCH/ncurses") || exit 1
 	cd ../../../..
+	compress_man_files ncurses
+	echo -n > "bin/$ARCH/ncurses.nonextra"
 fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/libedit" ]; then
 	cd "build/$ARCH/libedit/libedit-$LIBEDIT_VERSION"
 	[ -f Makefile ] && make clean
-	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -s" ./configure --host="$TARGET" --prefix=/usr && make install DESTDIR="$ROOT_DIR/bin/$ARCH/libedit") || exit 1
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -s" ./configure --host="$TARGET" --prefix=/usr && make install DESTDIR="$ROOT_DIR/bin/$ARCH/libedit") || exit 1
 	"$STRIP" "$ROOT_DIR/bin/$ARCH/libedit/"usr/lib/libedit.so.0.0.*
 	cd ../../../..
+	compress_man_files libedit
+	echo -n > "bin/$ARCH/libedit.nonextra"
 fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/sysvinit" ]; then
 	cd "build/$ARCH/sysvinit/sysvinit-$SYSVINIT_VERSION"
 	[ -f Makefile ] && make clean
-	make CC="$MUSL_GCC" LDFLAGS=-s ROOT="$ROOT_DIR/bin/$ARCH/sysvinit" DISTRO=Toyroot all install || exit 1
+	make CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s ROOT="$ROOT_DIR/bin/$ARCH/sysvinit" DISTRO=Toyroot all install || exit 1
 	rm -fr $ROOT_DIR/bin/$ARCH/sysvinit/usr/include
 	cd ../../../..
+	create_man_package_from_package sysvinit
+	echo -n > "bin/$ARCH/sysvinit.nonextra"
 fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/dash" ]; then
 	cd "build/$ARCH/dash/dash-$DASH_VERSION"
 	[ -f Makefile ] && make clean
-	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses -I$ROOT_DIR/bin/$ARCH/libedit/usr/include" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s" LIBS="-ledit -lncurses" ./configure --host="$TARGET" --prefix=/ --datarootdir=/usr/share --with-libedit && make install CC_FOR_BUILD=gcc DESTDIR="$ROOT_DIR/bin/$ARCH/dash") || exit 1
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses -I$ROOT_DIR/bin/$ARCH/libedit/usr/include" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s" LIBS="-ledit -lncurses" ./configure --host="$TARGET" --prefix=/ --datarootdir=/usr/share --with-libedit && make install CC_FOR_BUILD=gcc DESTDIR="$ROOT_DIR/bin/$ARCH/dash") || exit 1
 	cd ../../../..
+	create_man_package_from_package dash
+	echo -n > "bin/$ARCH/sysvinit.nonextra"
+fi
+if [ ! -d "$ROOT_DIR/bin/$ARCH/dhcp-dhclient" ]; then
+	cd "build/$ARCH/dhcp/dhcp-$DHCP_VERSION"
+	[ -f Makefile ] && make clean
+	echo ac_cv_file__dev_random=yes > config.cache
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS -fno-strict-aliasing" LDFLAGS=-s ./configure --host="$TARGET" --prefix=/ --datarootdir=/usr/share --includedir=/usr/include --libdir=/usr/lib --cache-file=config.cache && make install DESTDIR="$ROOT_DIR/bin/$ARCH/dhcp" CFLAGS="-I$ROOT_DIR/bin/$ARCH/dhcp/usr/include") || exit 1
+	rm -fr "$ROOT_DIR/bin/$ARCH/dhcp/etc"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/bin"
+	mv "$ROOT_DIR/bin/$ARCH/dhcp/bin/omshell" "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/sbin"
+	mv "$ROOT_DIR/bin/$ARCH/dhcp/sbin/dhclient" "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/sbin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man1"
+	mv "$ROOT_DIR/bin/$ARCH/dhcp/usr/share/man/man1"/* "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man1"
+	rm -fr "$ROOT_DIR/bin/$ARCH/dhcp/usr/share/man/man1"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man5"
+	mv "$ROOT_DIR/bin/$ARCH/dhcp/usr/share/man/man5"/dhclient* "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man5"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man8"
+	mv "$ROOT_DIR/bin/$ARCH/dhcp/usr/share/man/man8"/dhclient* "$ROOT_DIR/bin/$ARCH/dhcp-dhclient/usr/share/man/man8"
+	cd ../../../..
+	create_man_package_from_package dhcp-dhclient
+	create_man_package_from_package dhcp
+	create_dev_package_from_package dhcp
+	echo -n > "bin/$ARCH/dhcp-dhclient.nonextra"
+fi
+if [ ! -d "$ROOT_DIR/bin/$ARCH/iputils-ping" ]; then
+	cd "build/$ARCH/iputils/iputils-$IPUTILS_VERSION"
+	[ -f Makefile ] && make clean
+	make CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDLIB=-s USE_CAP=no USE_SYSFS=no USE_IDN=no USE_GNUTLS=no USE_CRYPTO=no SHELL=/bin/bash all man || exit 1
+	mkdir -p "$ROOT_DIR/bin/$ARCH/iputils-ping/bin"
+	cp -dp ping ping6 "$ROOT_DIR/bin/$ARCH/iputils-ping/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/iputils-ping/usr/share/man/man8"
+	cp doc/ping.8 "$ROOT_DIR/bin/$ARCH/iputils-ping/usr/share/man/man8"
+	ln -sf ping.8 "$ROOT_DIR/bin/$ARCH/iputils-ping/usr/share/man/man8/ping6.8"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/iputils/usr/bin"
+	cp -dp clockdiff tracepath tracepath6 traceroute6 "$ROOT_DIR/bin/$ARCH/iputils/usr/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/iputils/usr/sbin"
+	cp -dp arping rarpd rdisc tftpd "$ROOT_DIR/bin/$ARCH/iputils/usr/sbin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/iputils/usr/share/man/man8"
+	cp doc/arping.8 doc/clockdiff.8 doc/tracepath.8 doc/traceroute6.8 "$ROOT_DIR/bin/$ARCH/iputils/usr/share/man/man8"
+	ln -sf tracepath.8 "$ROOT_DIR/bin/$ARCH/iputils/usr/share/man/man8/tracepath6.8"
+	cd ../../../..
+	create_man_package_from_package iputils-ping
+	create_man_package_from_package iputils
+	echo -n > "bin/$ARCH/iputils-ping.nonextra"
 fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/toybox" ]; then
 	cd "build/$ARCH/toybox/toybox-$TOYBOX_VERSION"
 	[ -f Makefile ] && make clean
-	cp $ROOT_DIR/toybox.config .config
-	make CC="$MUSL_GCC" STRIP="$STRIP" PREFIX="$ROOT_DIR/bin/$ARCH/toybox" all install || exit 1
+	cp "$ROOT_DIR/toybox.config" .config
+	make CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" STRIP="$STRIP" PREFIX="$ROOT_DIR/bin/$ARCH/toybox" all install || exit 1
+	rm -f "$ROOT_DIR/bin/$ARCH/toybox/usr/bin/traceroute6"
 	cd ../../../..
+	echo -n > "bin/$ARCH/toybox.nonextra"
 fi
-if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux" ]; then
+if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux-mount" ]; then
 	cd "$ROOT_DIR/bin/$ARCH/toybox"
-	TOYBOX_FILES=`find`
+	TOYBOX_FILES="`find`"
 	cd ../../..
-	cd build/$ARCH/util-linux/util-linux-$UTIL_LINUX_VERSION
+	cd "build/$ARCH/util-linux/util-linux-$UTIL_LINUX_VERSION"
 	[ -f Makefile ] && make clean
 	find 
-	(CC="$MUSL_GCC" CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -lc -s" LIBS="-lncurses" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc \
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses" LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -lc -s" LIBS="-lncurses" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
 		--enable-shared \
-		--disable-static \
 		--disable-losetup \
-		--disable-cytune \
-		--disable-partx \
-		--disable-uuidd \
 		--disable-mountpoint \
-		--disable-fallocate \
 		--disable-unshare \
-		--disable-nsenter \
-		--disable-setpriv \
 		--disable-eject \
 		--disable-agetty \
-		--disable-cramfs \
-		--disable-bfs \
-		--disable-fdformat \
-		--disable-hwclock \
-		--disable-wdctl \
 		--disable-switch_root \
 		--disable-pivot_root \
 		--disable-kill \
 		--disable-last \
-		--disable-utmpdump \
-		--disable-mesg \
-		--disable-raw \
-		--disable-rename \
 		--disable-login \
 		--disable-nologin \
-		--disable-runuser \
-		--disable-ul \
 		--disable-more \
-		--disable-pg \
-		--disable-schedutils \
-		--disable-wall \
+		--disable-use-tty-group \
 		--without-systemdsystemunitdir \
 		PKG_CONFIG="" \
 		&& make install DESTDIR="$ROOT_DIR/bin/$ARCH/util-linux") || exit 1
 	for file in $TOYBOX_FILES; do
-		[ -e "$ROOT_DIR/bin/$ARCH/util-linux/$file" -a ! -d "$ROOT_DIR/bin/$ARCH/util-linux/$file" ] && rm -f "$ROOT_DIR/bin/$ARCH/util-linux/$file"
+		if [ -e "$ROOT_DIR/bin/$ARCH/util-linux/$file" -a ! -d "$ROOT_DIR/bin/$ARCH/util-linux/$file" ]; then 
+			rm -f "$ROOT_DIR/bin/$ARCH/util-linux/$file"
+			name="`basename "$file"`"
+			rm -f "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/man"/man?/"$name".*
+		fi
 	done
-	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/include
-	rm -f "$ROOT_DIR/bin/$ARCH/util-linux/"usr/lib/*.la
-	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/lib/pkgconfig
-	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/share/bash-completion
-	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/"usr/share/doc
+	chmod 755 "$ROOT_DIR/bin/$ARCH/util-linux/bin/mount"
+	chmod 755 "$ROOT_DIR/bin/$ARCH/util-linux/bin/umount"
+	rm -fr "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/bash-completion"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/bin"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/bin/mount" "$ROOT_DIR/bin/$ARCH/util-linux-mount/bin"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/bin/umount" "$ROOT_DIR/bin/$ARCH/util-linux-mount/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/lib"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/lib"/lib*.so.* "$ROOT_DIR/bin/$ARCH/util-linux-mount/lib"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/lib"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/lib"/lib*.so "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/lib"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/man/man8"/mount.8 "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
+	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/man/man8"/umount.8 "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
 	cd ../../../..
+	create_man_package_from_package util-linux-mount
+	create_man_package_from_package util-linux
+	create_dev_package_from_package util-linux
+	echo -n > "bin/$ARCH/util-linux-mount.nonextra"
 fi
-
-if [ -f packages.txt ]; then
-	cat packages.txt | (while read line; do
-		INIT_PKG_CFLAGS="-I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
-		INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
-		INIT_PKG_LIBS=""
-		case $line in
-			"#"*)	;;
-			"")	;;
-			*)	build_extra_package $line;;
+if [ ! -d "$ROOT_DIR/bin/$ARCH/uClibc++-build" ]; then
+	cd "build/$ARCH/uClibc++/uClibc++-$UCLIBCXX_VERSION"
+	[ -f Makefile ] && make clean
+	(make defconfig && make CC="$MUSL_GCC" CXX="$GXX -specs $ROOT_DIR/bin/$ARCH/musl/lib/musl-gcc.specs" OPTIMIZATION="$GCC_CFLAGS" STRIPTOOL="$STRIP" PREFIX="$ROOT_DIR/bin/$ARCH/uClibc++-build" all install) || exit 1
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++"
+	cp -drp "$ROOT_DIR/bin/$ARCH/uClibc++-build/"* "$ROOT_DIR/bin/$ARCH/uClibc++"
+	for lib in `ls "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/lib"`; do
+		case "$lib" in
+			lib*.so|lib*.so.*)
+				mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++/usr/lib"
+				ln -sf "../uClibc++/lib/$lib" "$ROOT_DIR/bin/$ARCH/uClibc++/usr/lib/$lib"
+				;;
 		esac
-	done)
+	done
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++/usr/bin"
+	ln -sf ../uClibc++/bin/g++-uc "$ROOT_DIR/bin/$ARCH/uClibc++/usr/bin/g++-uc"
+	cd ../../../..
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/include"
+	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/include"/* "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/include"
+	rm -fr "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/include"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/lib"
+	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/lib"/*.a "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/lib"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin"
+	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/bin/g++-uc" "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin"
+	rm -fr "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/bin"
+	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/bin/g++-uc" "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/bin"
+	rm -fr "$ROOT_DIR/bin/$ARCH/uClibc++/usr/bin"
+	echo -n > "bin/$ARCH/uClibc++-build.nonextra"
+fi
+if [ ! -d "$ROOT_DIR/bin/$ARCH/shadow-login" ]; then
+	cd "build/$ARCH/shadow/shadow-$SHADOW_VERSION"
+	[ -f Makefile ] && make clean
+	(CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-subordinate-ids -without-libpam --without-nscd &&
+		echo "#define ENABLE_SUBIDS 1" >> config.h &&
+		cp src/Makefile src/Makefile.orig &&
+		cat src/Makefile.orig | sed -e 's/^#am__append_1 = newgidmap newuidmap$/ubin_PROGRAMS += newgidmap\$\(EXEEXT\) newuidmap\$\(EXEEXT\)/' > src/Makefile &&
+		make all install DESTDIR="$ROOT_DIR/bin/$ARCH/shadow") || exit 1
+	cp "$ROOT_DIR/bin/$ARCH/shadow/etc/login.defs" "$ROOT_DIR/bin/$ARCH/shadow/etc/login.defs.tmp"
+	cat "$ROOT_DIR/bin/$ARCH/shadow/etc/login.defs.tmp" |  sed 's/^MAIL_CHECK_ENAB.*$/MAIL_CHECK_ENAB\t\tno/' > "$ROOT_DIR/bin/$ARCH/shadow/etc/login.defs"
+	rm -f "$ROOT_DIR/bin/$ARCH/shadow/etc/login.defs.tmp"
+	rm -f "$ROOT_DIR/bin/$ARCH/shadow/bin/groups"
+	rm -f "$ROOT_DIR/bin/$ARCH/shadow/usr/share/man/man1/groups.1"
+	cp man/man1/newgidmap.1 man/man1/newuidmap.1 "$ROOT_DIR/bin/$ARCH/shadow/usr/share/man/man1"
+	cp man/man5/subgid.5 man/man5/subuid.5 "$ROOT_DIR/bin/$ARCH/shadow/usr/share/man/man5"
+	rm -fr "$ROOT_DIR/bin/$ARCH/shadow/usr/share/man/man3"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/shadow-login/etc"
+	mv "$ROOT_DIR/bin/$ARCH/shadow/etc"/login.* "$ROOT_DIR/bin/$ARCH/shadow-login/etc"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/shadow-login/bin"
+	mv "$ROOT_DIR/bin/$ARCH/shadow/bin/login" "$ROOT_DIR/bin/$ARCH/shadow-login/bin"
+	mkdir -p "$ROOT_DIR/bin/$ARCH/shadow-login/usr/share/man/man1"
+	mv "$ROOT_DIR/bin/$ARCH/shadow/usr/share/man/man1/login.1" "$ROOT_DIR/bin/$ARCH/shadow-login/usr/share/man/man1"
+	cd ../../../..
+	create_man_package_from_package shadow-login
+	create_man_package_from_package shadow
+	echo -n > "bin/$ARCH/shadow-login.nonextra"
 fi
 
+INIT_PKG_CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
+INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
+INIT_PKG_LIBS=""
+process_extra_packages build_extra_package

@@ -30,10 +30,10 @@
 
 GCC="${GCC:=gcc}"
 
-ROOT_DIR=`pwd`
-TARGET=`$GCC -dumpmachine`
-HOST=`gcc -dumpmachine`
-export ARCH=`$GCC -dumpmachine | cut -d - -f 1`
+ROOT_DIR="`pwd`"
+TARGET="`$GCC -dumpmachine`"
+HOST="`gcc -dumpmachine`"
+export ARCH="`$GCC -dumpmachine | cut -d - -f 1`"
 
 case "$ARCH" in
 	arm)	PLATFORM="${PLATFORM:=vexpress}";;
@@ -41,6 +41,24 @@ case "$ARCH" in
 esac
 
 . ./functions.sh
+
+CUSTOM_CONFIG=false
+ONLY_CUSTOM_CONFIG=false
+FORCE_MENUCONFIG=false
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--custom-config)
+			CUSTOM_CONFIG=true
+			;;
+		--only-custom-config)
+			ONLY_CUSTOM_CONFIG=true
+			;;
+		--force-menuconfig)
+			FORCE_MENUCONFIG=true
+			;;
+	esac
+	shift
+done
 
 download_source linux-$LINUX_VERSION.tar.xz $LINUX_DOWNLOAD_URL
 
@@ -54,12 +72,45 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/linux" ]; then
 		export CROSS_COMPILE="$TARGET-"
 	fi
 	make clean
-	(make "${PLATFORM}"_defconfig && make) || exit 1
+	if [ $CUSTOM_CONFIG = true -o $ONLY_CUSTOM_CONFIG = true ]; then
+		if [ $FORCE_MENUCONFIG != true -a -f "$ROOT_DIR/kernel_config/$ARCH/$PLATFORM/.config" ]; then
+			cp "$ROOT_DIR/kernel_config/$ARCH/$PLATFORM/.config" .config
+		else
+			if [ $ONLY_CUSTOM_CONFIG != true ]; then
+				make "${PLATFORM}"_defconfig || exit 1
+			fi
+			while true; do
+				make menuconfig || exit 1
+				while true; do
+					echo "You can select one option from following options:"
+					echo "c - compile kernel"
+					echo "a - again configure kernel"
+					echo "q - quit with configuration saving"
+					echo "x - quit without configuration saving"
+					echo -n "What do you select? "
+					read line
+					ANSWER="`echo "$line" | tr '[:upper:]' '[:lower:]' | head -c 1`"
+					case "$ANSWER" in
+						c|a|q|x)	break;;
+					esac
+				done
+				[ "$ANSWER" = x ] && exit
+				[ "$ANSWER" = a ] && continue
+				mkdir -p "$ROOT_DIR/kernel_config/$ARCH/$PLATFORM"
+				cp .config "$ROOT_DIR/kernel_config/$ARCH/$PLATFORM/.config"
+				[ "$ANSWER" = q ] && exit
+				[ "$ANSWER" = c ] && break
+			done
+		fi
+	else
+		make "${PLATFORM}"_defconfig || exit 1
+	fi
+	make || exit 1
 	mkdir -p "$ROOT_DIR/bin/$ARCH/linux"
 	[ -f "arch/$ARCH/boot/Image" ] && cp "arch/$ARCH/boot/Image" "$ROOT_DIR/bin/$ARCH/linux"
 	[ -f "arch/$ARCH/boot/zImage" ] && cp "arch/$ARCH/boot/zImage" "$ROOT_DIR/bin/$ARCH/linux"
 	[ -f "arch/$ARCH/boot/bzImage" ] && cp "arch/$ARCH/boot/bzImage" "$ROOT_DIR/bin/$ARCH/linux"
 	[ -f vmlinux ] && cp vmlinux "$ROOT_DIR/bin/$ARCH/linux"
 	cd ../../../..
+	echo -n > "bin/$ARCH/linux.nonextra"
 fi
-

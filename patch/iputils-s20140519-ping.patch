@@ -1,0 +1,12 @@
+diff -Naur old/iputils-s20140519/ping.c new/iputils-s20140519/ping.c
+--- old/iputils-s20140519/ping.c	2014-05-19 23:35:28.000000000 +0200
++++ new/iputils-s20140519/ping.c	2014-07-02 15:42:01.756768664 +0200
+@@ -694,7 +694,7 @@
+ 	do {
+ 		static struct iovec iov = {outpack, 0};
+ 		static struct msghdr m = { &whereto, sizeof(whereto),
+-						   &iov, 1, &cmsg, 0, 0 };
++						   &iov, 1, 0, &cmsg, 0, 0, 0 };
+ 		m.msg_controllen = cmsg_len;
+ 		iov.iov_len = cc;
+ 

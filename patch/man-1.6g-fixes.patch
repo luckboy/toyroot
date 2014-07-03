@@ -1,0 +1,42 @@
+diff -Naur old/man-1.6g/src/apropos.sh new/man-1.6g/src/apropos.sh
+--- old/man-1.6g/src/apropos.sh	2005-08-21 01:26:06.000000000 +0200
++++ new/man-1.6g/src/apropos.sh	2014-06-28 14:02:26.964566266 +0200
+@@ -32,7 +32,7 @@
+     exit 1
+ fi
+ 
+-manpath=`man %manpathoption% | tr : '\040'`
++manpath=`man %manpathoption% | sed 's/:/ /g'`
+ 
+ if [ "$manpath" = "" ]
+ then
+diff -Naur old/man-1.6g/src/makewhatis.sh new/man-1.6g/src/makewhatis.sh
+--- old/man-1.6g/src/makewhatis.sh	2007-09-17 20:35:14.000000000 +0200
++++ new/man-1.6g/src/makewhatis.sh	2014-06-28 14:05:49.156563265 +0200
+@@ -153,14 +153,14 @@
+ esac
+ done
+ 
+-manpath=`echo ${manpath-$defmanpath} | tr : ' '`
++manpath=`echo ${manpath-$defmanpath} | sed 's/:/ /g'`
+ if [ x"$catpath" = x ]; then
+-   for d in `echo $defcatpath | tr : ' '`
++   for d in `echo $defcatpath | sed 's/:/ /g'`
+    do
+       if [ -d $d ]; then catpath=$d; break; fi
+    done
+ fi
+-catpath=`echo ${catpath} | tr : ' '`
++catpath=`echo ${catpath} | sed 's/:/ /g'`
+ 
+ # first truncate all the whatis files that will be created new,
+ # then only update - we might visit the same directory twice
+@@ -443,7 +443,7 @@
+        then
+ 	 cat ${mandir1}/whatis >> $TMPFILE
+        fi
+-       tr -s '\n' < $TMPFILE | sort -u > ${mandir1}/whatis
++       sed '/^$/d' < $TMPFILE | sort -u > ${mandir1}/whatis
+ 
+        chmod 644 ${mandir1}/whatis
+        rm $TMPFILE

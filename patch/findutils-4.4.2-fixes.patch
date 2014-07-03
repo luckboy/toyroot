@@ -1,0 +1,23 @@
+diff -Naur old/findutils-4.4.2/gnulib/lib/freadahead.c new/findutils-4.4.2/gnulib/lib/freadahead.c
+--- old/findutils-4.4.2/gnulib/lib/freadahead.c	2009-05-10 23:23:57.000000000 +0200
++++ new/findutils-4.4.2/gnulib/lib/freadahead.c	2014-06-28 10:44:26.363025770 +0200
+@@ -61,6 +61,6 @@
+   /* fp->_Buf <= fp->_Next <= fp->_Rend */
+   return fp->_Rend - fp->_Next;
+ #else
+- #error "Please port gnulib freadahead.c to your platform! Look at the definition of fflush, fread on your system, then report this to bug-gnulib."
++  return 0;
+ #endif
+ }
+diff -Naur old/findutils-4.4.2/gnulib/lib/fseeko.c new/findutils-4.4.2/gnulib/lib/fseeko.c
+--- old/findutils-4.4.2/gnulib/lib/fseeko.c	2009-05-10 23:25:10.000000000 +0200
++++ new/findutils-4.4.2/gnulib/lib/fseeko.c	2014-06-28 10:47:32.279026206 +0200
+@@ -95,7 +95,7 @@
+       && fp->_Rback == fp->_Back + sizeof (fp->_Back)
+       && fp->_Rsave == NULL)
+ #else
+-  #error "Please port gnulib fseeko.c to your platform! Look at the code in fpurge.c, then report this to bug-gnulib."
++  if (0)
+ #endif
+     {
+       off_t pos = lseek (fileno (fp), offset, whence);
