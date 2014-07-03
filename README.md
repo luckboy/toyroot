@@ -164,4 +164,4 @@ Usage of this script:
 
 Options of this script:
 
-        --only-dist                     remove just the dist directory.
+        --only-dist                     just remove the dist directory.
