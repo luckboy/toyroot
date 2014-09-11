@@ -1,0 +1,23 @@
+diff -Naur old/gcc-4.6.4/libgcc/Makefile.in new/gcc-4.6.4/libgcc/Makefile.in
+--- old/gcc-4.6.4/libgcc/Makefile.in	2012-12-04 20:11:33.000000000 +0100
++++ new/gcc-4.6.4/libgcc/Makefile.in	2014-07-28 19:34:19.688740730 +0200
+@@ -201,7 +201,7 @@
+ export toolexecdir
+ export toolexeclibdir
+ 
+-version := $(shell $(CC) -dumpversion)
++version := 4.6.4
+ 
+ ifeq ($(decimal_float),yes)
+ ifeq ($(enable_decimal_float),bid)
+@@ -235,8 +235,8 @@
+ INTERNAL_CFLAGS = $(CFLAGS) $(LIBGCC2_CFLAGS) $(HOST_LIBGCC2_CFLAGS) \
+ 		  $(INCLUDES) @set_have_cc_tls@ @set_use_emutls@
+ 
+-MULTIDIR := $(shell $(CC) $(CFLAGS) -print-multi-directory)
+-MULTIOSDIR := $(shell $(CC) $(CFLAGS) -print-multi-os-directory)
++MULTIDIR := .
++MULTIOSDIR := .
+ 
+ MULTIOSSUBDIR := $(shell if test $(MULTIOSDIR) != .; then echo /$(MULTIOSDIR); fi)
+ inst_libdir = $(libsubdir)$(MULTISUBDIR)

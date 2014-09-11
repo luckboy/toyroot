@@ -1,0 +1,47 @@
+diff -Naur old/gcc-4.8.3/gcc/Makefile.in new/gcc-4.8.3/gcc/Makefile.in
+--- old/gcc-4.8.3/gcc/Makefile.in	2014-04-05 12:26:19.000000000 +0200
++++ new/gcc-4.8.3/gcc/Makefile.in	2014-07-27 14:54:37.994301078 +0200
+@@ -2091,11 +2091,19 @@
+ 
+ dumpvers: dumpvers.c
+ 
+-CFLAGS-version.o += -DBASEVER=$(BASEVER_s) -DDATESTAMP=$(DATESTAMP_s) \
+-	-DREVISION=$(REVISION_s) \
+-	-DDEVPHASE=$(DEVPHASE_s) -DPKGVERSION=$(PKGVERSION_s) \
+-	-DBUGURL=$(BUGURL_s)
++#CFLAGS-version.o += -DBASEVER=$(BASEVER_s) -DDATESTAMP=$(DATESTAMP_s) \
++#	-DREVISION=$(REVISION_s) \
++#	-DDEVPHASE=$(DEVPHASE_s) -DPKGVERSION=$(PKGVERSION_s) \
++#	-DBUGURL=$(BUGURL_s)
+ version.o: version.c version.h $(REVISION) $(DATESTAMP) $(BASEVER) $(DEVPHASE)
++	echo "#define BASEVER "$(BASEVER_s) > tmp-version-defs.h
++	echo "#define DATESTAMP "$(DATESTAMP_s) >> tmp-version-defs.h
++	echo "#define REVISION "$(REVISION_s) >> tmp-version-defs.h
++	echo "#define DEVPHASE "$(DEVPHASE_s) >> tmp-version-defs.h
++	echo "#define PKGVERSION "$(PKGVERSION_s) >> tmp-version-defs.h
++	echo "#define BUGURL "$(BUGURL_s) >> tmp-version-defs.h
++	$(COMPILER) -c $(ALL_COMPILERFLAGS) $(ALL_CPPFLAGS) -include tmp-version-defs.h $< $(OUTPUT_OPTION)
++	rm -f tmp-version-defs.h
+ 
+ gtype-desc.o: gtype-desc.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) \
+ 	$(HASHTAB_H) $(SPLAY_TREE_H) $(OBSTACK_H) $(BITMAP_H) \
+@@ -3822,11 +3830,15 @@
+ ## several C macro definitions, just like version.o
+ build/version.o:  version.c version.h \
+                   $(REVISION) $(DATESTAMP) $(BASEVER) $(DEVPHASE)
++	echo "#define BASEVER "$(BASEVER_s) > build/tmp-version-defs.h
++	echo "#define DATESTAMP "$(DATESTAMP_s) >> build/tmp-version-defs.h
++	echo "#define REVISION "$(REVISION_s) >> build/tmp-version-defs.h
++	echo "#define DEVPHASE "$(DEVPHASE_s) >> build/tmp-version-defs.h
++	echo "#define PKGVERSION "$(PKGVERSION_s) >> build/tmp-version-defs.h
++	echo "#define BUGURL "$(BUGURL_s) >> build/tmp-version-defs.h
+ 	$(COMPILER_FOR_BUILD) -c $(BUILD_COMPILERFLAGS) $(BUILD_CPPFLAGS) \
+-	-DBASEVER=$(BASEVER_s) -DDATESTAMP=$(DATESTAMP_s) \
+-	-DREVISION=$(REVISION_s) \
+-	-DDEVPHASE=$(DEVPHASE_s) -DPKGVERSION=$(PKGVERSION_s) \
+-	-DBUGURL=$(BUGURL_s) -o $@ $<
++	-include build/tmp-version-defs.h -o $@ $<
++	rm -f build/tmp-version-defs.h
+ 
+ # Header dependencies for the programs that generate source code.
+ # These are library modules...

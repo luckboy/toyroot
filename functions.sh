@@ -320,12 +320,14 @@ build_extra_package() {
 		local PKG_SRC="`echo "$PKG_SRC_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/" -e "s/%e/$PKG_SRC_EXT/"`"
 		local PKG_BUILD_DIR="`echo "$PKG_BUILD_DIR_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/"`"
 		download_source "$PKG_SRC" "$PKG_DOWNLOAD_URL"
-		extract_package "$PKG_NAME" "$PKG_SRC" "$PKG_BUILD_DIR" &&
-		patch_package "$PKG_NAME" "$PKG_BUILD_DIR"
+		[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postdonwload.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postdonwload.sh"
+		if extract_package "$PKG_NAME" "$PKG_SRC" "$PKG_BUILD_DIR"; then
+			[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postextract.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postextract.sh"
+			patch_package "$PKG_NAME" "$PKG_BUILD_DIR"
+		fi
 		local SAVED_PWD="`pwd`"
 		[ ! -d "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR" ] && mkdir -p "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR"
 		cd "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR"
-		
 		if [ -f "$ROOT_DIR/pkg/$PKG_NAME.sh" ]; then
 			. "$ROOT_DIR/pkg/$PKG_NAME.sh" || exit 1
 		else
@@ -340,6 +342,7 @@ build_extra_package() {
 		create_man_package_from_package "$PKG_NAME"
 		create_dev_package_from_package "$PKG_NAME"
 		create_doc_package_from_package "$PKG_NAME"
+		[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh"
 	fi
 	[ -d "bin/$ARCH/$PKG_NAME"_dev ] && DEV_PKGS="$DEV_PKGS $PKG_NAME"
 }
@@ -366,12 +369,37 @@ process_extra_packages() {
 					if [ "$ALL_PKGS" = true ]; then
 						"$1" $line
 					else
-						(echo $PKGS | grep -q "`extra_package_name $line`") && "$1" $line
+						IS_FOUND_PKG=false
+						for p in $PKGS; do
+							[ "$p" = "`extra_package_name $line`" ] && IS_FOUND_PKG=true
+						done
+						[ $IS_FOUND_PKG = true ] && "$1" $line
 					fi
 					;;
 			esac
 		done)
 	fi
+}
+
+select_programs() {
+	for gcc_version in 4.8 4.7 4.6; do
+		if [ -x "$PKG_ROOT_DIR/usr/bin/gcc-$gcc_version" ]; then
+			case "$ARCH" in
+				arm)	GCC_TARGET="arm-linux-musleabi";;
+				*)	GCC_TARGET="$ARCH-linux-musl";;
+			esac
+			"bin/$ARCH/toyroot-utils/usr/bin/selectgcc" --root-dir="$PKG_ROOT_DIR" --host="$GCC_TARGET" "$gcc_version"
+			break
+		fi
+	done
+	"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" cc gcc
+	"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" c++ g++
+	for p in nawk mawk gawk; do
+		if [ -x "$PKG_ROOT_DIR/usr/bin/$p" ]; then
+			"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" awk "$p"
+			break
+		fi
+	done
 }
 
 install_all_infos() {

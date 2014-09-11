@@ -1,0 +1,117 @@
+#!/bin/sh
+# Copyright (c) 2014 Łukasz Szpakowski.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+HOST=""
+IS_HOST=false
+ROOT_DIR=/
+GCC_VERSION=
+IS_GCC_VERSION=false
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--host=*)
+			HOST="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_HOST=true
+			;;
+		--root-dir=*)
+			ROOT_DIR="`echo "$1" | sed 's/^[^=]*=//'`"
+			;;
+		--help)
+			echo "\
+Usage: $0 [<option> ...] <gcc version>
+			
+Options:
+  --host=<host>                 set host
+  --root-dir=<root directory>   set root directory
+  --help			display this text
+"
+			exit 0
+			;;
+		*)
+			if [ $IS_GCC_VERSION != true ]; then
+				GCC_VERSION="$1"
+				IS_GCC_VERSION=true
+			fi
+			;;
+	esac
+	shift
+done
+
+if [ $IS_GCC_VERSION != true ]; then
+	echo "No gcc version" >&2
+	exit 1
+fi
+
+if [ -e "$ROOT_DIR/usr/bin/gcc-$GCC_VERSION" ]; then
+	[ ! -d "$ROOT_DIR/etc/selectgcc/bin" ] && mkdir -p "$ROOT_DIR/etc/selectgcc/bin"
+	[ ! -d "$ROOT_DIR/etc/selectgcc/lib" ] && mkdir -p "$ROOT_DIR/etc/selectgcc/lib"
+	[ ! -d "$ROOT_DIR/etc/selectgcc/man1" ] && mkdir -p "$ROOT_DIR/etc/selectgcc/man1"
+
+	for name in `ls "$ROOT_DIR/etc/selectgcc/bin"`; do
+		rm -f "$ROOT_DIR/usr/bin/$name"
+		rm -f "$ROOT_DIR/etc/selectgcc/bin/$name"
+	done
+	for name in `ls "$ROOT_DIR/etc/selectgcc/lib"`; do
+		rm -f "$ROOT_DIR/usr/lib/$name"
+		rm -f "$ROOT_DIR/etc/selectgcc/lib/$name"
+	done
+	for name in `ls "$ROOT_DIR/etc/selectgcc/man1"`; do
+		rm -f "$ROOT_DIR/usr/share/man/man1/$name"
+		rm -f "$ROOT_DIR/etc/selectgcc/man1/$name"
+	done
+
+	for name in cpp g++ gcc gcc-ar gcc-nm gcc-ranlib gcov; do
+		if [ -e "$ROOT_DIR/usr/bin/$name-$GCC_VERSION" ]; then
+			ln -sf "../../../usr/bin/$name-$GCC_VERSION" "$ROOT_DIR/etc/selectgcc/bin/$name"
+			ln -sf "../../etc/selectgcc/bin/$name" "$ROOT_DIR/usr/bin/$name"
+		fi
+	done
+	[ $IS_HOST != true ] && HOST="`gcc -dumpmachine`"
+	for name in cpp g++ gcc gcc-ar gcc-nm gcc-ranlib gcov; do
+		if [ -e "$ROOT_DIR/usr/bin/$HOST-$name-$GCC_VERSION" ]; then
+			ln -sf "../../../usr/bin/$HOST-$name-$GCC_VERSION" "$ROOT_DIR/etc/selectgcc/bin/$HOST-$name"
+			ln -sf "../../etc/selectgcc/bin/$HOST-$name" "$ROOT_DIR/usr/bin/$HOST-$name"
+		fi
+	done
+	for file in "$ROOT_DIR/usr/lib/gcc/$HOST/$GCC_VERSION"/lib*.so "$ROOT_DIR/usr/lib/gcc/$HOST/$GCC_VERSION"/lib*.so.*; do
+		name="`basename "$file"`"
+		if [ -e "$ROOT_DIR/usr/lib/gcc/$HOST/$GCC_VERSION/$name" ]; then
+			ln -sf "../../../usr/lib/gcc/$HOST/$GCC_VERSION/$name" "$ROOT_DIR/etc/selectgcc/lib/$name"
+			ln -sf "../../etc/selectgcc/lib/$name" "$ROOT_DIR/usr/lib/$name"
+		fi
+	done
+	for name in cpp g++ gcc gcov; do
+		if [ -e "$ROOT_DIR/usr/share/man/man1/$name-$GCC_VERSION.1.gz" ]; then
+			ln -sf "../../../usr/share/man/man1/$name-$GCC_VERSION.1.gz" "$ROOT_DIR/etc/selectgcc/man1/$name.1.gz"
+			ln -sf "../../../../etc/selectgcc/man1/$name.1.gz" "$ROOT_DIR/usr/share/man/man1/$name.1.gz"
+		fi
+	done
+else
+	echo "Not found gcc-$GCC_VERSION" >&2
+	exit 1
+fi
+exit 0

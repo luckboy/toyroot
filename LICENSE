@@ -52,7 +52,7 @@ patch/musl-*.patch
 These patches can be apply to the original musl sources without change of
 the musl license.
 
-Copyright (c) 2014 Łukasz Szpakowski
+Copyright (c) 2014 Łukasz Szpakowski.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-The patches under GPLv2:
+The patches of the packages under GPLv2:
 patch/sysvinit-*.patch
 patch/man-*.patch
 
@@ -93,7 +93,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA or see
 <http://www.gnu.org/licenses/>.
 
-The patches under GPLv3:
+The patches of the packages under GPLv3:
+patch/binutils-*.patch
 patch/gzip-*.patch
 patch/findutils-*.patch
 
@@ -112,12 +113,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-The patches under LGPLv2.1:
+The patches of the packages under LGPLv2.1:
 patch/uClibc++-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 
-This library is free software; you can redistribute it and/or
+This library is free software: you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.
@@ -131,3 +132,88 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 or see <http://www.gnu.org/licenses/>.
+
+The patches from the cross-musl project:
+musl_toolchain/gcc-*.diff
+
+Each file patch is under same license as the corresponding file. Therefore,
+the patches of the runtime library files are under GPLv3 with GCC Runtime 
+Library Exception and the patches of other files are under the GPLv3.
+
+Copyright (C) 2012, 2013, 2014 Gregor Richards.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Copyright (C) 2012, 2013, 2014 Gregor Richards.
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Under Section 7 of GPL version 3, you are granted additional
+permissions described in the GCC Runtime Library Exception, version
+3.1, as published by the Free Software Foundation.
+
+You should have received a copy of the GNU General Public License and
+a copy of the GCC Runtime Library Exception along with this program;
+see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<http://www.gnu.org/licenses/>.
+
+The patches of the gcc packages:
+patch/gcc-*.patch
+
+These patches are under GPLv3 except the runtime library patches these are
+under GPLv3 with GCC Runtime Library Exception.
+
+Copyright (C) 2014 Łukasz Szpakowski.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Copyright (C) 2014 Łukasz Szpakowski.
+
+This library is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Under Section 7 of GPL version 3, you are granted additional
+permissions described in the GCC Runtime Library Exception, version
+3.1, as published by the Free Software Foundation.
+
+You should have received a copy of the GNU General Public License and
+a copy of the GCC Runtime Library Exception along with this program;
+see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<http://www.gnu.org/licenses/>.

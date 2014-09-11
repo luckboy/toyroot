@@ -1,0 +1,14 @@
+diff -Naur old/binutils-2.24/Makefile.in new/binutils-2.24/Makefile.in
+--- old/binutils-2.24/Makefile.in	2013-12-02 10:31:21.000000000 +0100
++++ new/binutils-2.24/Makefile.in	2014-07-29 15:30:11.440703198 +0200
+@@ -227,7 +227,9 @@
+ @if gcc-bootstrap
+ 	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
+ @endif gcc-bootstrap
+-	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
++	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
++	STRIP="$(STRIP)"; export STRIP; \
++	STRIP_FOR_TARGET="$(STRIP_FOR_TARGET)"; export STRIP_FOR_TARGET;
+ 
+ POSTSTAGE1_CXX_EXPORT = \
+ 	CXX='$(CXX)'; export CXX; \

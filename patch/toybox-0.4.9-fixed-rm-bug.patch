@@ -1,0 +1,18 @@
+--- old/toybox-0.4.9/toys/posix/rm.c	2014-07-07 06:43:29.000000000 +0200
++++ new/toybox-0.4.9/toys/posix/rm.c	2014-09-09 20:41:25.224197107 +0200
+@@ -91,8 +91,14 @@
+     // There's a race here where a file removed between this access and
+     // dirtree's stat would report the nonexistence as an error, but that's
+     // not a normal "it didn't exist" so I'm ok with it.
+-    if ((toys.optflags & FLAG_f) && (access(*s, F_OK) && errno == ENOENT))
++    if ((toys.optflags & FLAG_f) && (access(*s, F_OK) && errno == ENOENT)) {
++      struct stat st;
++      if (!lstat(*s, &st)) {
++      	chmod(*s, 0600);
++      	if (unlink(*s)) perror_msg("%s", s);
++      }
+       continue;
++    }
+     dirtree_read(*s, do_rm);
+   }
+ }

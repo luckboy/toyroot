@@ -1,0 +1,32 @@
+diff -Naur old/gcc-4.8.3/libgcc/config/i386/t-crtfm new/gcc-4.8.3/libgcc/config/i386/t-crtfm
+--- old/gcc-4.8.3/libgcc/config/i386/t-crtfm	2012-10-26 19:54:50.000000000 +0200
++++ new/gcc-4.8.3/libgcc/config/i386/t-crtfm	2014-07-27 15:13:53.510283925 +0200
+@@ -1,4 +1,4 @@
+ # This is an endfile, Use -minline-all-stringops to ensure
+ # that __builtin_memset doesn't refer to the lib function memset().
+ crtfastmath.o: $(srcdir)/config/i386/crtfastmath.c
+-	$(gcc_compile) -mfxsr -msse -c $<
++	$(gcc_compile) -msse -c $<
+diff -Naur old/gcc-4.8.3/libgcc/config/i386/t-linux new/gcc-4.8.3/libgcc/config/i386/t-linux
+--- old/gcc-4.8.3/libgcc/config/i386/t-linux	2012-08-22 21:46:28.000000000 +0200
++++ new/gcc-4.8.3/libgcc/config/i386/t-linux	2014-07-27 15:13:18.326284447 +0200
+@@ -3,4 +3,4 @@
+ # t-slibgcc-elf-ver and t-linux
+ SHLIB_MAPFILES = libgcc-std.ver $(srcdir)/config/i386/libgcc-glibc.ver
+ 
+-HOST_LIBGCC2_CFLAGS += -mlong-double-80
++#HOST_LIBGCC2_CFLAGS += -mlong-double-80
+diff -Naur old/gcc-4.8.3/libgcc/Makefile.in new/gcc-4.8.3/libgcc/Makefile.in
+--- old/gcc-4.8.3/libgcc/Makefile.in	2013-02-04 20:06:20.000000000 +0100
++++ new/gcc-4.8.3/libgcc/Makefile.in	2014-07-27 18:10:59.550126182 +0200
+@@ -286,8 +286,8 @@
+ # Extra flags to use when compiling crt{begin,end}.o.
+ CRTSTUFF_T_CFLAGS =
+ 
+-MULTIDIR := $(shell $(CC) $(CFLAGS) -print-multi-directory)
+-MULTIOSDIR := $(shell $(CC) $(CFLAGS) -print-multi-os-directory)
++MULTIDIR := .
++MULTIOSDIR := .
+ 
+ MULTIOSSUBDIR := $(shell if test $(MULTIOSDIR) != .; then echo /$(MULTIOSDIR); fi)
+ inst_libdir = $(libsubdir)$(MULTISUBDIR)

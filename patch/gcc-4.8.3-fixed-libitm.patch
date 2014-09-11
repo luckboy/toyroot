@@ -1,0 +1,21 @@
+diff -Naur old/gcc-4.8.3/libitm/configure.tgt new/gcc-4.8.3/libitm/configure.tgt
+--- old/gcc-4.8.3/libitm/configure.tgt	2014-04-04 15:45:28.000000000 +0200
++++ new/gcc-4.8.3/libitm/configure.tgt	2014-07-27 15:32:44.682267133 +0200
+@@ -64,7 +64,7 @@
+ 	      XCFLAGS="${XCFLAGS} -fomit-frame-pointer"
+ 	    fi
+ 	esac
+-	XCFLAGS="${XCFLAGS} -mrtm"
++	#XCFLAGS="${XCFLAGS} -mrtm"
+ 	ARCH=x86
+ 	;;
+ 
+@@ -105,7 +105,7 @@
+ 	    XCFLAGS="${XCFLAGS} -fomit-frame-pointer"
+ 	    ;;
+ 	esac
+-	XCFLAGS="${XCFLAGS} -mrtm"
++	#XCFLAGS="${XCFLAGS} -mrtm"
+ 	ARCH=x86
+ 	;;
+   s390|s390x)

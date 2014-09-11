@@ -1,0 +1,2 @@
+[ -f Makefile ] && make clean
+(CC="$MUSL_GCC" CFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS" STRIP="$STRIP" ./configure --prefix=/usr && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME") || exit 1

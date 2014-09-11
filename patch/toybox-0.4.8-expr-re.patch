@@ -1,0 +1,160 @@
+--- old/toybox-0.4.8/toys/pending/expr.c	2014-04-17 02:49:15.000000000 +0200
++++ new/toybox-0.4.8/toys/pending/expr.c	2014-09-08 17:20:16.215128054 +0200
+@@ -25,7 +25,7 @@
+ 
+ #define FOR_expr
+ #include "toys.h"
+-
++#include <regex.h>
+ 
+ GLOBALS(
+   int argidx;
+@@ -37,6 +37,7 @@
+ struct value {
+   char *s;
+   long long i;
++  char *a;
+ };
+ 
+ static void parse_expr(struct value *ret, struct value *v);
+@@ -59,6 +60,7 @@
+ 
+   v->i = strtoll(arg, &endp, 10);
+   v->s = *endp ? arg : NULL;
++  v->a = arg;
+ }
+ 
+ 
+@@ -111,7 +113,35 @@
+ 
+ static void re(struct value *lhs, const struct value *rhs)
+ {
+-  error_exit("regular expression match not implemented");
++  regex_t reg;
++  regmatch_t matches[2];
++  if (lhs->a && rhs->a) {
++    if (regcomp(&reg, rhs->a, 0) == 0) {
++      if (regexec(&reg, lhs->a, 2, matches, 0) == 0 && matches[0].rm_so == 0) {
++        if (matches[1].rm_so != -1) {
++          lhs->s = lhs->a + matches[1].rm_so;
++          lhs->a[matches[1].rm_eo] = 0;
++          lhs->i = 0;
++          lhs->a = NULL;
++        } else {
++          lhs->s = NULL;
++          lhs->i = matches[0].rm_eo - matches[0].rm_so; 
++          lhs->a = NULL;     
++        }
++      } else {
++      	lhs->s = (reg.re_nsub > 0 ? "" : NULL);
++        lhs->i = 0;
++        lhs->a = NULL;
++      }
++      regfree(&reg);
++    } else {
++      lhs->s = NULL;
++      lhs->i = 0;
++      lhs->a = NULL;
++    }
++  } else {
++    error_exit("argument isn't string");
++  }
+ }
+ 
+ static void mod(struct value *lhs, const struct value *rhs)
+@@ -119,6 +149,7 @@
+   if (lhs->s || rhs->s) error_exit("non-integer argument");
+   if (is_zero(rhs)) error_exit("division by zero");
+   lhs->i %= rhs->i;
++  lhs->a = NULL;
+ }
+ 
+ static void divi(struct value *lhs, const struct value *rhs)
+@@ -126,60 +157,70 @@
+   if (lhs->s || rhs->s) error_exit("non-integer argument");
+   if (is_zero(rhs)) error_exit("division by zero");
+   lhs->i /= rhs->i;
++  lhs->a = NULL;
+ }
+ 
+ static void mul(struct value *lhs, const struct value *rhs)
+ {
+   if (lhs->s || rhs->s) error_exit("non-integer argument");
+   lhs->i *= rhs->i;
++  lhs->a = NULL;
+ }
+ 
+ static void sub(struct value *lhs, const struct value *rhs)
+ {
+   if (lhs->s || rhs->s) error_exit("non-integer argument");
+   lhs->i -= rhs->i;
++  lhs->a = NULL;
+ }
+ 
+ static void add(struct value *lhs, const struct value *rhs)
+ {
+   if (lhs->s || rhs->s) error_exit("non-integer argument");
+   lhs->i += rhs->i;
++  lhs->a = NULL;
+ }
+ 
+ static void ne(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) != 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void lte(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) <= 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void lt(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) < 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void gte(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) >= 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void gt(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) > 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void eq(struct value *lhs, const struct value *rhs)
+ {
+   lhs->i = cmp(lhs, rhs) == 0;
+   lhs->s = NULL;
++  lhs->a = NULL;
+ }
+ 
+ static void and(struct value *lhs, const struct value *rhs)
+@@ -187,6 +228,7 @@
+   if (is_zero(lhs) || is_zero(rhs)) {
+     lhs->i = 0;
+     lhs->s = NULL;
++    lhs->a = NULL;
+   }
+ }
+ 
+@@ -254,7 +296,7 @@
+ 
+ void expr_main(void)
+ {
+-  struct value tok, ret = {0};
++  struct value tok, ret = {0, 0, 0};
+ 
+   toys.exitval = 2; // if exiting early, indicate invalid expression
+ 

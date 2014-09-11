@@ -114,3 +114,4 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/linux" ]; then
 	cd ../../../..
 	echo -n > "bin/$ARCH/linux.nonextra"
 fi
+exit 0

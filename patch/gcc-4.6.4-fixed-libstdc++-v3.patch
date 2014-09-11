@@ -1,0 +1,54 @@
+diff -Naur old/gcc-4.6.4/libstdc++-v3/include/tr1/exp_integral.tcc new/gcc-4.6.4/libstdc++-v3/include/tr1/exp_integral.tcc
+--- old/gcc-4.6.4/libstdc++-v3/include/tr1/exp_integral.tcc	2011-01-30 23:39:36.000000000 +0100
++++ new/gcc-4.6.4/libstdc++-v3/include/tr1/exp_integral.tcc	2014-07-28 19:03:13.428768434 +0200
+@@ -59,6 +59,8 @@
+   {
+   _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
++    template<typename _Tp> _Tp __expint_E1(const _Tp __x);
++  
+     /**
+      *   @brief Return the exponential integral @f$ E_1(x) @f$
+      *          by series summation.  This should be good
+diff -Naur old/gcc-4.6.4/libstdc++-v3/libsupc++/eh_call.cc new/gcc-4.6.4/libstdc++-v3/libsupc++/eh_call.cc
+--- old/gcc-4.6.4/libstdc++-v3/libsupc++/eh_call.cc	2011-01-15 01:27:10.000000000 +0100
++++ new/gcc-4.6.4/libstdc++-v3/libsupc++/eh_call.cc	2014-07-29 10:52:22.287923035 +0200
+@@ -134,7 +134,11 @@
+ 	  _Unwind_Word offset;
+ 
+ 	  offset = (_Unwind_Word) &rtti_list[n * (rtti_stride >> 2)];
++#if (__GNUC__ * 1000 + __GNUC_MINOR__) <= 4006
+ 	  offset = _Unwind_decode_target2(offset);
++#else
++	  offset = _Unwind_decode_typeinfo_ptr(0, offset);
++#endif
+ 	  catch_type = (const std::type_info*) (offset);
+ 
+ 	  if (__cxa_type_match(&new_xh->unwindHeader, catch_type, false,
+diff -Naur old/gcc-4.6.4/libstdc++-v3/libsupc++/eh_personality.cc new/gcc-4.6.4/libstdc++-v3/libsupc++/eh_personality.cc
+--- old/gcc-4.6.4/libstdc++-v3/libsupc++/eh_personality.cc	2011-01-15 01:27:10.000000000 +0100
++++ new/gcc-4.6.4/libstdc++-v3/libsupc++/eh_personality.cc	2014-07-29 10:52:31.031922905 +0200
+@@ -95,7 +95,11 @@
+   _Unwind_Ptr ptr;
+ 
+   ptr = (_Unwind_Ptr) (info->TType - (i * 4));
++#if (__GNUC__ * 1000 + __GNUC_MINOR__) <= 4006
+   ptr = _Unwind_decode_target2(ptr);
++#else
++  ptr = _Unwind_decode_typeinfo_ptr(0, ptr);
++#endif
+   
+   return reinterpret_cast<const std::type_info *>(ptr);
+ }
+@@ -127,7 +131,11 @@
+       if (tmp == 0)
+         return false;
+ 
++#if (__GNUC__ * 1000 + __GNUC_MINOR__) <= 4006
+       tmp = _Unwind_decode_target2((_Unwind_Word) e);
++#else
++      tmp = _Unwind_decode_typeinfo_ptr(0, (_Unwind_Word) e);
++#endif
+ 
+       // Match a ttype entry.
+       catch_type = reinterpret_cast<const std::type_info*>(tmp);

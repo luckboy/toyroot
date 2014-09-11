@@ -85,6 +85,7 @@ mkdir -p "$ROOT_FS_DIR/sys"
 mkdir -p "$ROOT_FS_DIR/tmp"
 mkdir -p "$ROOT_FS_DIR/var/db"
 mkdir -p "$ROOT_FS_DIR/var/run"
+mkdir -p "$ROOT_FS_DIR/var/tmp"
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
 case "$ARCH" in
@@ -106,6 +107,7 @@ fi
 
 PKG_ROOT_DIR="$ROOT_FS_DIR"
 process_extra_packages install_extra_package
+select_programs
 install_all_infos
 
 genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"

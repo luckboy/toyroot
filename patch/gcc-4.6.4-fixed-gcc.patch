@@ -1,0 +1,27 @@
+diff -Naur old/gcc-4.6.4/gcc/config/arm/unwind-arm.c new/gcc-4.6.4/gcc/config/arm/unwind-arm.c
+--- old/gcc-4.6.4/gcc/config/arm/unwind-arm.c	2009-10-30 15:55:10.000000000 +0100
++++ new/gcc-4.6.4/gcc/config/arm/unwind-arm.c	2014-07-29 22:21:27.259021857 +0200
+@@ -1117,7 +1117,11 @@
+ 		      if (data[1] != (_uw) -1)
+ 			{
+ 			  /* Match a catch specification.  */
++#if (__GNUC__ * 1000 + __GNUC_MINOR__) <= 4006
+ 			  rtti = _Unwind_decode_target2 ((_uw) &data[1]);
++#else
++			  rtti = _Unwind_decode_typeinfo_ptr (0, (_uw) &data[1]);
++#endif
+ 			  if (!__cxa_type_match (ucbp, (type_info *) rtti,
+ 						 is_reference,
+ 						 &matched))
+@@ -1166,7 +1170,11 @@
+ 		      for (i = 0; i < rtti_count; i++)
+ 			{
+ 			  matched = (void *)(ucbp + 1);
++#if (__GNUC__ * 1000 + __GNUC_MINOR__) <= 4006
+ 			  rtti = _Unwind_decode_target2 ((_uw) &data[i + 1]);
++#else
++			  rtti = _Unwind_decode_typeinfo_ptr (0, (_uw) &data[i + 1]);
++#endif
+ 			  if (__cxa_type_match (ucbp, (type_info *) rtti, 0,
+ 						&matched))
+ 			    break;

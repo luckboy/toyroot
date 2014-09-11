@@ -1,0 +1,14 @@
+diff -Naur old/gcc-4.8.3/libstdc++-v3/src/c++11/random.cc new/gcc-4.8.3/libstdc++-v3/src/c++11/random.cc
+--- old/gcc-4.8.3/libstdc++-v3/src/c++11/random.cc	2013-02-03 18:54:05.000000000 +0100
++++ new/gcc-4.8.3/libstdc++-v3/src/c++11/random.cc	2014-07-27 15:28:31.686270888 +0200
+@@ -28,6 +28,10 @@
+ 
+ #if defined __i386__ || defined __x86_64__
+ # include <cpuid.h>
++
++# ifndef signature_INTEL_ebx
++#  define signature_INTEL_ebx	0x756e6547
++# endif
+ #endif
+ 
+ 

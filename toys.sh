@@ -50,6 +50,11 @@ LINUX_INCLUDE_DIR="$INCLUDE_DIR/linux"
 MUSL_GCC="$ROOT_DIR/bin/$ARCH/musl/bin/musl-gcc"
 GXX_UC="$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/bin/g++-uc"
 
+case "$TARGET" in
+	*-*-*eabi)	MUSL_TARGET="`echo "$TARGET" | sed 's/-[^-]*eabi$/-musleabi/'`";;
+	*-*-*)		MUSL_TARGET="`echo "$TARGET" | sed 's/-[^-]*$/-musl/'`";;
+esac
+
 PKGS=""
 ALL_PKGS=false
 NO_EXTRA_PKGS=false
@@ -197,7 +202,7 @@ fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/toybox" ]; then
 	cd "build/$ARCH/toybox/toybox-$TOYBOX_VERSION"
 	[ -f Makefile ] && make clean
-	cp "$ROOT_DIR/toybox.config" .config
+	cp "$ROOT_DIR/config/toybox-$TOYBOX_VERSION.config" .config
 	make CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" STRIP="$STRIP" PREFIX="$ROOT_DIR/bin/$ARCH/toybox" all install || exit 1
 	rm -f "$ROOT_DIR/bin/$ARCH/toybox/usr/bin/traceroute6"
 	cd ../../../..
@@ -225,6 +230,8 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux-mount" ]; then
 		--disable-nologin \
 		--disable-more \
 		--disable-use-tty-group \
+		--without-systemd \
+		--without-python \
 		--without-systemdsystemunitdir \
 		PKG_CONFIG="" \
 		&& make install DESTDIR="$ROOT_DIR/bin/$ARCH/util-linux") || exit 1
@@ -242,9 +249,13 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux-mount" ]; then
 	mv "$ROOT_DIR/bin/$ARCH/util-linux/bin/mount" "$ROOT_DIR/bin/$ARCH/util-linux-mount/bin"
 	mv "$ROOT_DIR/bin/$ARCH/util-linux/bin/umount" "$ROOT_DIR/bin/$ARCH/util-linux-mount/bin"
 	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/lib"
-	mv "$ROOT_DIR/bin/$ARCH/util-linux/lib"/lib*.so.* "$ROOT_DIR/bin/$ARCH/util-linux-mount/lib"
+	for name in blkid mount uuid; do
+		mv "$ROOT_DIR/bin/$ARCH/util-linux/lib/lib$name".so.* "$ROOT_DIR/bin/$ARCH/util-linux-mount/lib"
+	done
 	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/lib"
-	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/lib"/lib*.so "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/lib"
+	for name in blkid mount uuid; do
+		mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/lib/lib$name".so "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/lib"
+	done
 	mkdir -p "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
 	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/man/man8"/mount.8 "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
 	mv "$ROOT_DIR/bin/$ARCH/util-linux/usr/share/man/man8"/umount.8 "$ROOT_DIR/bin/$ARCH/util-linux-mount/usr/share/man/man8"
@@ -277,7 +288,8 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/uClibc++-build" ]; then
 	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/lib"
 	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/lib"/*.a "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/lib"
 	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin"
-	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/bin/g++-uc" "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin"
+	sed -e 's/^exec [^ ]* [^ ]* [^ ]*/exec g++/' -e "s/WRAPPER_LIBS=\" -L[^ ]*/WRAPPER_LIBS=\" -L\\/usr\\/lib\\/gcc\\/""$MUSL_TARGET""\\/\`readlink \\/etc\\/selectgcc\\/bin\\/g++ | cut -d - -f 2\`/" "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/bin/g++-uc" > "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin/g++-uc"
+	chmod 755 "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/uClibc++/bin/g++-uc"
 	rm -fr "$ROOT_DIR/bin/$ARCH/uClibc++/usr/uClibc++/bin"
 	mkdir -p "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/bin"
 	mv "$ROOT_DIR/bin/$ARCH/uClibc++/usr/bin/g++-uc" "$ROOT_DIR/bin/$ARCH/uClibc++_dev/usr/bin"
@@ -311,8 +323,16 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/shadow-login" ]; then
 	create_man_package_from_package shadow
 	echo -n > "bin/$ARCH/shadow-login.nonextra"
 fi
-
+if [ ! -d "$ROOT_DIR/bin/$ARCH/toyroot-utils" ]; then
+	mkdir -p "$ROOT_DIR/build/$ARCH/toyroot-utils/utils"
+	cd "$ROOT_DIR/build/$ARCH/toyroot-utils/utils"
+	cp -r "$ROOT_DIR/utils"/* ./
+	make clean
+	make install DESTDIR="$ROOT_DIR/bin/$ARCH/toyroot-utils" CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s
+	cd ../../../..
+fi
 INIT_PKG_CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
 INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
 INIT_PKG_LIBS=""
 process_extra_packages build_extra_package
+exit 0

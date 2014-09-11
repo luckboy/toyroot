@@ -1,0 +1,13 @@
+--- old/gcc-4.6.4/Makefile.in	2012-01-02 12:02:10.000000000 +0100
++++ new/gcc-4.6.4/Makefile.in	2014-07-29 14:44:27.744639696 +0200
+@@ -228,7 +228,9 @@
+ @if gcc-bootstrap
+ 	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
+ @endif gcc-bootstrap
+-	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
++	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
++	STRIP="$(STRIP)"; export STRIP; \
++	STRIP_FOR_TARGET="$(STRIP_FOR_TARGET)"; export STRIP_FOR_TARGET;
+ 
+ POSTSTAGE1_CXX_EXPORT = \
+ 	CXX='$(CXX)'; export CXX; \

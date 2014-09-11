@@ -1,0 +1,97 @@
+#!/bin/sh
+# Copyright (c) 2014 Łukasz Szpakowski.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+ROOT_DIR=/
+LINK_NAME=
+IS_LINK_NAME=false
+PROGRAM_NAME=
+IS_PROGRAM_NAME=false
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--root-dir=*)
+			ROOT_DIR="`echo "$1" | sed 's/^[^=]*=//'`"
+			;;
+		--help)
+			echo "\
+Usage: $0 [<option> ...] <link name> <program name>
+		
+Options:
+  --root-dir=<root directory>   set root directory
+  --help			display this text
+"
+			exit 0
+			;;
+		*)
+			if [ $IS_LINK_NAME != true ]; then
+				LINK_NAME="$1"
+				IS_LINK_NAME=true
+			elif [ $IS_PROGRAM_NAME != true ]; then
+				PROGRAM_NAME="$1"
+				IS_PROGRAM_NAME=true
+			fi
+			;;
+	esac
+	shift
+done
+
+if [ -e "$ROOT_DIR/usr/bin/$PROGRAM_NAME" -o -e "$ROOT_DIR/usr/sbin/$PROGRAM_NAME" ]; then
+	[ ! -d "$ROOT_DIR/etc/selectprog/bin" ] && mkdir -p "$ROOT_DIR/etc/selectprog/bin"
+	[ ! -d "$ROOT_DIR/etc/selectprog/sbin" ] && mkdir -p "$ROOT_DIR/etc/selectprog/sbin"
+	[ ! -d "$ROOT_DIR/etc/selectprog/man1" ] && mkdir -p "$ROOT_DIR/etc/selectprog/man1"
+	[ ! -d "$ROOT_DIR/etc/selectprog/man8" ] && mkdir -p "$ROOT_DIR/etc/selectprog/man8"
+
+	rm -f "$ROOT_DIR/usr/bin/$LINK_NAME"
+	rm -f "$ROOT_DIR/etc/selectprog/bin/$LINK_NAME"
+	rm -f "$ROOT_DIR/usr/sbin/$LINK_NAME"
+	rm -f "$ROOT_DIR/etc/selectprog/sbin/$LINK_NAME"
+	rm -f "$ROOT_DIR/usr/share/man/man1/$LINK_NAME.1.gz"
+	rm -f "$ROOT_DIR/etc/selectprog/man1/$LINK_NAME.1.gz"
+	rm -f "$ROOT_DIR/usr/share/man/man8/$LINK_NAME.8.gz"
+	rm -f "$ROOT_DIR/etc/selectprog/man8/$LINK_NAME.8.gz"
+	
+	if [ -e "$ROOT_DIR/usr/bin/$PROGRAM_NAME" ]; then
+		ln -sf "../../../usr/bin/$PROGRAM_NAME" "$ROOT_DIR/etc/selectprog/bin/$LINK_NAME"
+		ln -sf "../../etc/selectprog/bin/$LINK_NAME" "$ROOT_DIR/usr/bin/$LINK_NAME"
+	fi
+	if [ -e "$ROOT_DIR/usr/sbin/$PROGRAM_NAME" ]; then
+		ln -sf "../../../usr/sbin/$PROGRAM_NAME" "$ROOT_DIR/etc/selectprog/sbin/$LINK_NAME"
+		ln -sf "../../etc/selectprog/sbin/$LINK_NAME" "$ROOT_DIR/usr/sbin/$LINK_NAME"
+	fi
+	if [ -e "$ROOT_DIR/usr/share/man/man1/$PROGRAM_NAME.1.gz" ]; then
+		ln -sf "../../../usr/share/man/man1/$PROGRAM_NAME.1.gz" "$ROOT_DIR/etc/selectprog/man1/$LINK_NAME.1.gz"
+		ln -sf "../../../../etc/selectprog/man1/$LINK_NAME.1.gz" "$ROOT_DIR/usr/share/man/man1/$LINK_NAME.1.gz"
+	fi
+	if [ -e "$ROOT_DIR/usr/share/man/man8/$PROGRAM_NAME.8.gz" ]; then
+		ln -sf "../../../usr/share/man/man8/$PROGRAM_NAME.8.gz" "$ROOT_DIR/etc/selectprog/man8/$LINK_NAME.8.gz"
+		ln -sf "../../../../etc/selectprog/man8/$LINK_NAME.8.gz" "$ROOT_DIR/usr/share/man/man8/$LINK_NAME.8.gz"
+	fi
+else
+	echo "Not found $PROGRAM_NAME" >&2
+	exit 1
+fi
+exit 0

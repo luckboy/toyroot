@@ -1,0 +1,13 @@
+diff -Naur old/openssl-1.0.1i/crypto/ui/ui_openssl.c new/openssl-1.0.1i/crypto/ui/ui_openssl.c
+--- old/openssl-1.0.1i/crypto/ui/ui_openssl.c	2014-07-22 21:41:23.000000000 +0200
++++ new/openssl-1.0.1i/crypto/ui/ui_openssl.c	2014-09-08 17:37:59.751112266 +0200
+@@ -220,6 +220,9 @@
+ #undef SGTTY
+ #endif
+ 
++#undef TERMIO
++#define TERMIOS
++
+ #ifdef TERMIOS
+ # include <termios.h>
+ # define TTY_STRUCT		struct termios
