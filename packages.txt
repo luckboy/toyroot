@@ -4,6 +4,7 @@ dhcp
 util-linux
 shadow
 toyroot-utils
+grub
 grep		2.20		tar.xz		http://ftp.gnu.org/gnu/grep
 gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
 bzip2		1.0.6		tar.gz		http://www.bzip.org/1.0.6
