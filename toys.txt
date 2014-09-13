@@ -20,3 +20,5 @@ UCLIBCXX_VERSION=0.2.4
 UCLIBCXX_DOWNLOAD_URL=http://cxx.uclibc.org/src
 SHADOW_VERSION=4.2.1
 SHADOW_DOWNLOAD_URL=http://pkg-shadow.alioth.debian.org/releases
+GRUB_VERSION=0.97
+GRUB_DOWNLOAD_URL=http://alpha.gnu.org/gnu/grub

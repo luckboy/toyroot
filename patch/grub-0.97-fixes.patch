@@ -1,0 +1,56 @@
+diff -Naur old/grub-0.97/stage2/char_io.c new/grub-0.97/stage2/char_io.c
+--- old/grub-0.97/stage2/char_io.c	2005-02-01 21:51:23.000000000 +0100
++++ new/grub-0.97/stage2/char_io.c	2014-09-13 20:39:36.610631370 +0200
+@@ -29,6 +29,12 @@
+ # include <serial.h>
+ #endif
+ 
++typedef __builtin_va_list	va_list;
++
++#define va_start(ap, last)	__builtin_va_start(ap, last)
++#define va_arg(ap, type)	__builtin_va_arg(ap, type)
++#define va_end(ap)		__builtin_va_end(ap)
++
+ #ifndef STAGE1_5
+ struct term_entry term_table[] =
+   {
+@@ -152,10 +158,10 @@
+ void
+ grub_printf (const char *format,...)
+ {
+-  int *dataptr = (int *) &format;
++  va_list ap;
+   char c, str[16];
+-  
+-  dataptr++;
++
++  va_start(ap, format);
+ 
+   while ((c = *(format++)) != 0)
+     {
+@@ -170,21 +176,22 @@
+ 	  case 'X':
+ #endif
+ 	  case 'u':
+-	    *convert_to_ascii (str, c, *((unsigned long *) dataptr++)) = 0;
++	    *convert_to_ascii (str, c, va_arg(ap, unsigned long)) = 0;
+ 	    grub_putstr (str);
+ 	    break;
+ 
+ #ifndef STAGE1_5
+ 	  case 'c':
+-	    grub_putchar ((*(dataptr++)) & 0xff);
++	    grub_putchar (va_arg(ap, int) & 0xff);
+ 	    break;
+ 
+ 	  case 's':
+-	    grub_putstr ((char *) *(dataptr++));
++	    grub_putstr (va_arg(ap, char *));
+ 	    break;
+ #endif
+ 	  }
+     }
++  va_end(ap);
+ }
+ 
+ #ifndef STAGE1_5

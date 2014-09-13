@@ -32,6 +32,7 @@ GCC="${GCC:=gcc}"
 GCC_CFLAGS="${CFLAGS:=-Os}"
 
 GXX="`echo "$GCC" | sed -e s/gcc$/g++/`"
+OBJCOPY="`echo "$GCC" | sed -e s/gcc$/objcopy/`"
 ROOT_DIR="`pwd`"
 TARGET="`$GCC -dumpmachine`"
 HOST="`gcc -dumpmachine`"
@@ -110,6 +111,15 @@ extract_and_patch_package toybox toybox-$TOYBOX_VERSION.tar.bz2 toybox-$TOYBOX_V
 extract_and_patch_package util-linux util-linux-$UTIL_LINUX_VERSION.tar.xz util-linux-$UTIL_LINUX_VERSION
 extract_and_patch_package uClibc++ uClibc++-$UCLIBCXX_VERSION.tar.xz uClibc++-$UCLIBCXX_VERSION
 extract_and_patch_package shadow shadow-$SHADOW_VERSION.tar.xz shadow-$SHADOW_VERSION
+
+case "$ARCH" in
+	i[3-9]86|x86_64)
+		download_source grub-$GRUB_VERSION.tar.gz $GRUB_DOWNLOAD_URL
+		
+		extract_and_patch_package grub grub-$GRUB_VERSION.tar.gz grub-$GRUB_VERSION
+		extract_and_patch_package grub-host grub-$GRUB_VERSION.tar.gz grub-$GRUB_VERSION
+		;;
+esac
 
 mkdir -p "$ROOT_DIR/bin/$ARCH"
 
@@ -331,6 +341,38 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/toyroot-utils" ]; then
 	make install DESTDIR="$ROOT_DIR/bin/$ARCH/toyroot-utils" CC="$MUSL_GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s
 	cd ../../../..
 fi
+
+case "$ARCH" in
+	i[3-9]86|x86_64)
+		if [ ! -d "$ROOT_DIR/bin/$ARCH/grub" ]; then
+			cd "build/$ARCH/grub/grub-$GRUB_VERSION"
+			[ -f Makefile ] && make clean
+			echo '#!/bin/sh' > ../grub-gcc
+			echo 'M32=false' >> ../grub-gcc
+			echo 'for a in $*; do [ "$a" = -m32 ] && M32=true; done' >> ../grub-gcc
+			echo 'if [ $M32 != true ]; then' >> ../grub-gcc
+			echo "$GCC -specs $ROOT_DIR/bin/$ARCH/musl/lib/musl-gcc.specs"' $*' >> ../grub-gcc
+			echo 'else' >> ../grub-gcc
+			echo "$GCC"' $*' >> ../grub-gcc
+			echo 'fi' >> ../grub-gcc
+			chmod 755 ../grub-gcc
+			(CC="$ROOT_DIR/build/$ARCH/grub/grub-gcc" OBJCOPY="$OBJCOPY -R .note.gnu.build-id" ./configure --host="$TARGET" --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --cache-file=config.cache && make DESTDIR="$ROOT_DIR/bin/$ARCH/grub" install) || exit 1
+			rm -f "$ROOT_DIR/bin/$ARCH/grub/usr/share/info/dir"
+			cd ../../../..
+			create_man_package_from_package grub
+		fi
+		if [ ! -d "$ROOT_DIR/bin/$ARCH/grub-host" ]; then
+			cd "build/$ARCH/grub-host/grub-$GRUB_VERSION"
+			[ -f Makefile ] && make clean
+			(OBJCOPY="$OBJCOPY -R .note.gnu.build-id" ./configure --host="$HOST" --prefix="$ROOT_DIR/bin/$ARCH/grub-host" --cache-file=config.cache && make install) || exit 1
+			rm -f "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/$ARCH-pc"/*
+			cp -dp "$ROOT_DIR/bin/$ARCH/grub/usr/lib/grub/$ARCH-pc"/* "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/$ARCH-pc"
+			cd ../../../..
+			echo -n > "bin/$ARCH/grub-host.nonextra"
+		fi
+		;;
+esac
+
 INIT_PKG_CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
 INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
 INIT_PKG_LIBS=""
