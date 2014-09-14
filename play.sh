@@ -26,19 +26,55 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-ARCH=$1
-[ "$ARCH" = "" ] && ARCH=`arch`
+FS_NAME=""
+IS_FS_NAME=false
+ISO=false
+ARCH=""
+IS_ARCH=false
+MACHINE=""
+IS_MACHINE=false
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--fs-name=*)
+			FS_NAME="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_FS_NAME=true
+			;;
+		--iso)
+			ISO=true
+			;;
+		*)
+			if [ $IS_ARCH != true ]; then
+				ARCH="$1"
+				IS_ARCH=true
+			elif [ $IS_MACHINE != true ]; then
+				MACHINE="$1"
+				IS_MACHINE=true
+			fi
+			;;
+	esac
+	shift
+done
+if [ $IS_FS_NAME != true ]; then
+	if [ $ISO != true ]; then
+		FS_NAME=root
+	else
+		FS_NAME=iso
+	fi
+fi
+[ $IS_ARCH != true ] && ARCH="`arch`"
 
 case "$ARCH" in
 	arm)
-		MACHINE="$2"
-		[ "$MACHINE" = "" ] && MACHINE=vexpress-a9
-		qemu-system-arm -M $MACHINE -drive file=dist/arm/rootfs.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
+		[ $IS_MACHINE != true ] && MACHINE=vexpress-a9
+		qemu-system-arm -M "$MACHINE" -drive file=dist/arm/fs/$FS_NAME.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
 		;;
 	x86_64)
-		MACHINE="$2"
-		[ "$MACHINE" = "" ] && MACHINE=pc-1.0
-		qemu-system-x86_64 -M $MACHINE -hda dist/x86_64/rootfs.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
+		[ $IS_MACHINE != true ] && MACHINE=pc-1.0
+		if [ $ISO != true ]; then
+			qemu-system-x86_64 -M "$MACHINE" -hda dist/x86_64/fs/$FS_NAME.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
+		else
+			qemu-system-x86_64 -M "$MACHINE" -boot c -cdrom dist/x86_64/fs/$FS_NAME.img -netdev user,id=mynet -device e1000,netdev=mynet			
+		fi
 		;;
 	*)
 		echo "Unsupported architecture" >&2

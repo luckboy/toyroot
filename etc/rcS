@@ -16,6 +16,12 @@ mount -f /dev
 mount -f /proc
 mount -a
 
+echo "Preparing filesystems ..."
+if [ "`readlink /etc/mtab`" = /proc/mounts ]; then
+	mkdir -p /var/etc /var/db /var/run /var/tmp
+	echo -n > /var/etc/resolv.conf
+fi
+
 echo "Setting hostname ..."
 [ -e /etc/hostname ] && hostname "`cat /etc/hostname`"
 

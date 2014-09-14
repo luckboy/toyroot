@@ -76,6 +76,21 @@ extract_and_patch_package() {
 	extract_package "$1" "$2" "$3" && patch_package "$1" "$3"
 }
 
+install_kernel_package() {
+	mkdir -p "$K_PKG_ROOT_DIR"
+	KERNEL=""
+	if [ -e "bin/$ARCH/linux/bzImage" ]; then
+		K_PKG_KERNEL_FILE=/bzImage
+		cp -dp "bin/$ARCH/linux/bzImage" "$K_PKG_ROOT_DIR"
+	elif [ -e "bin/$ARCH/linux/zImage" ]; then
+		K_PKG_KERNEL_FILE=/zImage
+		cp -dp "bin/$ARCH/linux/zImage" "$K_PKG_ROOT_DIR"
+	elif [ -e "bin/$ARCH/linux/Image" ]; then
+		K_PKG_KERNEL_FILE=/Image
+		cp -dp "bin/$ARCH/linux/Image" "$K_PKG_ROOT_DIR"
+	fi
+}
+
 install_non_extra_packages() {
 	mkdir -p "$NX_PKG_ROOT_DIR/lib"
 	cp -dp "bin/$ARCH/musl/lib"/*.so "$NX_PKG_ROOT_DIR/lib"
