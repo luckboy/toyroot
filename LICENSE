@@ -75,6 +75,7 @@ THE SOFTWARE.
 The patches of the packages under GPLv2:
 patch/sysvinit-*.patch
 patch/man-*.patch
+patch/grub-0.*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 
