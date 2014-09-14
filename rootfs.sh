@@ -130,7 +130,7 @@ if [ $ISO != true ]; then
 EOT
 else
 	cat >> "$ROOT_FS_DIR/etc/fstab" << EOT
-/dev/root	/		iso9660		$ROOT_FS_OPTS	0	1
+/dev/root	/		iso9660		$ROOT_FS_OPTS	0	0
 EOT
 fi
 if [ $READ_ONLY = true ]; then
@@ -161,7 +161,8 @@ if [ $ISO = true ]; then
 			mkdir -p "$ROOT_FS_DIR/boot/grub" 
 			cat > "$ROOT_FS_DIR/boot/grub/menu.lst" <<EOT
 default 0
-timeout 10
+timeout 0
+hiddenmenu
 title Toyroot
 	kernel $K_PKG_KERNEL_FILE root=/dev/sr0 devtmpfs.mount=1
 EOT
