@@ -1,0 +1,11 @@
+--- old/grub-0.97/stage2/Makefile.in	2005-05-08 04:42:39.000000000 +0200
++++ new/grub-0.97/stage2/Makefile.in	2014-09-15 00:10:15.339212858 +0200
+@@ -426,6 +426,8 @@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ 
++STAGE2_CFLAGS += -fno-reorder-functions
++
+ # For test target.
+ TESTS = size_test
+ noinst_SCRIPTS = $(TESTS)
