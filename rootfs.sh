@@ -88,10 +88,11 @@ mkdir -p "$ROOT_FS_DIR/var/run"
 mkdir -p "$ROOT_FS_DIR/var/tmp"
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
-case "$ARCH" in
-	arm)	ln -sf mmcblk0p1 "$ROOT_FS_DIR/dev/root";;
-	*)	ln -sf sda1 "$ROOT_FS_DIR/dev/root";;
-esac
+cat "$ROOT_FS_DIR/etc/fstab.head" > "$ROOT_FS_DIR/etc/fstab"
+cat >> "$ROOT_FS_DIR/etc/fstab" << EOT
+/dev/root	/		ext2		defaults	0	1
+EOT
+cat "$ROOT_FS_DIR/etc/fstab.tail" >> "$ROOT_FS_DIR/etc/fstab"
 echo -n > "$ROOT_FS_DIR/etc/mtab"
 mkdir -p "$ROOT_FS_DIR/sbin"
 chmod 755 "$ROOT_FS_DIR/etc/dhclient-script"
@@ -111,3 +112,4 @@ select_programs
 install_all_infos
 
 genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"
+exit 0

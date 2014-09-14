@@ -2,13 +2,18 @@
 echo "Starting Toyroot ..."
 
 echo "Mounting filesystems ..."
+mknod /dev/root b "`mountpoint -dq / | cut -d : -f 1`" "`mountpoint -dq / | cut -d : -f 2`"
+chmod 600 /dev/root
 mount -n -o remount /
-echo -n > /etc/mtab
+mount -n /proc
+[ "`readlink /etc/mtab`" = /proc/mounts ] || echo -n > /etc/mtab
 mount -o remount /
 [ -e /dev/pts ] && rm -fr /dev/pts
 [ -e /dev/shm ] && rm -fr /dev/shm
 mkdir -p /dev/pts
 mkdir -p /dev/shm
+mount -f /dev
+mount -f /proc
 mount -a
 
 echo "Setting hostname ..."
