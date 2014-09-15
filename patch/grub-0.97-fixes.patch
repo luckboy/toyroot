@@ -1,6 +1,5 @@
-diff -Naur old/grub-0.97/stage2/char_io.c new/grub-0.97/stage2/char_io.c
 --- old/grub-0.97/stage2/char_io.c	2005-02-01 21:51:23.000000000 +0100
-+++ new/grub-0.97/stage2/char_io.c	2014-09-13 20:39:36.610631370 +0200
++++ new/grub-0.97/stage2/char_io.c	2014-09-15 20:36:36.402706550 +0200
 @@ -29,6 +29,12 @@
  # include <serial.h>
  #endif
@@ -54,3 +53,49 @@ diff -Naur old/grub-0.97/stage2/char_io.c new/grub-0.97/stage2/char_io.c
  }
  
  #ifndef STAGE1_5
+@@ -193,11 +200,11 @@
+ {
+   /* XXX hohmuth
+      ugly hack -- should unify with printf() */
+-  int *dataptr = (int *) &format;
++  va_list ap;
+   char c, *ptr, str[16];
+   char *bp = buffer;
+ 
+-  dataptr++;
++  va_start(ap, format);
+ 
+   while ((c = *format++) != 0)
+     {
+@@ -207,7 +214,7 @@
+ 	switch (c = *(format++))
+ 	  {
+ 	  case 'd': case 'u': case 'x':
+-	    *convert_to_ascii (str, c, *((unsigned long *) dataptr++)) = 0;
++	    *convert_to_ascii (str, c, va_arg(ap, unsigned long)) = 0;
+ 
+ 	    ptr = str;
+ 
+@@ -215,12 +222,12 @@
+ 	      *bp++ = *(ptr++); /* putchar(*(ptr++)); */
+ 	    break;
+ 
+-	  case 'c': *bp++ = (*(dataptr++))&0xff;
++	  case 'c': *bp++ = va_arg(ap, int)&0xff;
+ 	    /* putchar((*(dataptr++))&0xff); */
+ 	    break;
+ 
+ 	  case 's':
+-	    ptr = (char *) (*(dataptr++));
++	    ptr = va_arg(ap, char *);
+ 
+ 	    while ((c = *ptr++) != 0)
+ 	      *bp++ = c; /* putchar(c); */
+@@ -228,6 +235,7 @@
+ 	  }
+     }
+ 
++  va_end(ap);
+   *bp = 0;
+   return bp - buffer;
+ }

@@ -26,21 +26,24 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-FS_NAME=""
-IS_FS_NAME=false
-ISO=false
+NAME=""
+IS_NAME=false
+PLAY_TYPE=fs
 ARCH=""
 IS_ARCH=false
 MACHINE=""
 IS_MACHINE=false
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--fs-name=*)
-			FS_NAME="`echo "$1" | sed 's/^[^=]*=//'`"
-			IS_FS_NAME=true
+		--name=*)
+			NAME="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_NAME=true
+			;;
+		--disk)
+			PLAY_TYPE=disk
 			;;
 		--iso)
-			ISO=true
+			PLAY_TYPE=iso
 			;;
 		*)
 			if [ $IS_ARCH != true ]; then
@@ -54,11 +57,11 @@ while [ $# -gt 0 ]; do
 	esac
 	shift
 done
-if [ $IS_FS_NAME != true ]; then
-	if [ $ISO != true ]; then
-		FS_NAME=root
+if [ $IS_NAME != true ]; then
+	if [ $PLAY_TYPE != iso ]; then
+		NAME=root
 	else
-		FS_NAME=iso
+		NAME=iso
 	fi
 fi
 [ $IS_ARCH != true ] && ARCH="`arch`"
@@ -66,15 +69,22 @@ fi
 case "$ARCH" in
 	arm)
 		[ $IS_MACHINE != true ] && MACHINE=vexpress-a9
-		qemu-system-arm -M "$MACHINE" -drive file=dist/arm/fs/$FS_NAME.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
+		qemu-system-arm -M "$MACHINE" -drive file=dist/arm/fs/$NAME.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
 		;;
 	x86_64)
 		[ $IS_MACHINE != true ] && MACHINE=pc-1.0
-		if [ $ISO != true ]; then
-			qemu-system-x86_64 -M "$MACHINE" -hda dist/x86_64/fs/$FS_NAME.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
-		else
-			qemu-system-x86_64 -M "$MACHINE" -boot c -cdrom dist/x86_64/fs/$FS_NAME.img -netdev user,id=mynet -device e1000,netdev=mynet			
-		fi
+		case $PLAY_TYPE in
+			disk)
+				qemu-system-x86_64 -M "$MACHINE" -boot c -hda dist/x86_64/disk/$NAME.img -netdev user,id=mynet -device e1000,netdev=mynet
+				;;
+			iso)
+				qemu-system-x86_64 -M "$MACHINE" -boot d -cdrom dist/x86_64/fs/$NAME.img -netdev user,id=mynet -device e1000,netdev=mynet
+				;;
+			*)
+				qemu-system-x86_64 -M "$MACHINE" -hda dist/x86_64/fs/$NAME.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
+				;;
+			
+		esac
 		;;
 	*)
 		echo "Unsupported architecture" >&2

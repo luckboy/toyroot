@@ -1,4 +1,4 @@
-devtmpfs	/dev/		devtmpfs	defaults	0	0
+devtmpfs	/dev		devtmpfs	defaults	0	0
 proc		/proc		proc		defaults	0	0
 devpts		/dev/pts	devpts		gid=5,mode=620	0	0
 tmpfs		/dev/shm	tmpfs		defaults	0	0

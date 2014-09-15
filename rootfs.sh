@@ -30,19 +30,25 @@ ARCH="${ARCH:=`arch`}"
 
 . ./functions.sh
 
+NAME=""
+IS_NAME=false
 PKGS=""
 ALL_PKGS=false
 NO_EXTRA_PKGS=false
 PKG_SUFFIXES=""
 FS_SIZE=65536
 FS_INODES=32768
-IS_FS_NAME=false
-FS_NAME=""
+ROOT_DEV=""
+IS_ROOT_DEV=false
 ISO=false
 READ_ONLY=false
-ETC_HOSTNAME=toyroot.qemunet
+NO_BOOT=false
 while [ $# -gt 0 ]; do
 	case "$1" in
+		--name=*)
+			NAME="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_NAME=true
+			;;
 		--pkg-list-file)
 			PKGS="$PKGS `cat package_list.txt`"
 			;;
@@ -65,9 +71,9 @@ while [ $# -gt 0 ]; do
 		--fs-inodes=*)
 			FS_INODES="`echo "$1" | sed 's/^[^=]*=//'`"
 			;;
-		--fs-name=*)
-			FS_NAME="`echo "$1" | sed 's/^[^=]*=//'`"
-			IS_FS_NAME=true
+		--root-dev=*)
+			ROOT_DEV="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_ROOT_DEV=true
 			;;
 		--iso)
 			ISO=true
@@ -75,8 +81,8 @@ while [ $# -gt 0 ]; do
 		--read-only)
 			READ_ONLY=true
 			;;
-		--hostname=*)
-			ETC_HOSTNAME="`echo "$1" | sed 's/^[^=]*=//'`"
+		--no-boot)
+			NO_BOOT=true
 			;;
 		*)
 			PKGS="$PKGS $1"
@@ -84,22 +90,32 @@ while [ $# -gt 0 ]; do
 	esac
 	shift
 done
-PKG_SUFFIXES="`echo "$PKG_SUFFIXES" | sed 's/,/ /g'`"
-if [ $IS_FS_NAME != true ]; then
+if [ $IS_NAME != true ]; then
 	if [ $ISO != true ]; then
-		FS_NAME=root
+		NAME=root
 	else
-		FS_NAME=iso
+		NAME=iso
 	fi
 fi
+PKG_SUFFIXES="`echo "$PKG_SUFFIXES" | sed 's/,/ /g'`"
 [ $ISO = true ] && READ_ONLY=true
 [ "$PKGS" = "" -a $ALL_PKGS != true ] && PKGS="$PKGS `cat package_list.txt`"
 
-ROOT_FS_DIR="dist/$ARCH/fs/$FS_NAME"
-ROOT_FS_IMG="dist/$ARCH/fs/$FS_NAME.img"
+ROOT_FS_DIR="dist/$ARCH/fs/$NAME"
+ROOT_FS_IMG="dist/$ARCH/fs/$NAME.img"
+if [ $ISO != true ]; then
+	ROOT_FS_TYPE=ext2
+else
+	ROOT_FS_TYPE=iso9660
+fi
+PROFILE_DIR="profile/$NAME"
+
+#
+# A root file system.
+#
 
 mkdir -p "$ROOT_FS_DIR"
-cp -drp etc/ "$ROOT_FS_DIR"
+cp -drp etc "$ROOT_FS_DIR"
 chmod 755 "$ROOT_FS_DIR/etc/rcS"
 chmod 755 "$ROOT_FS_DIR/etc/rc.shutdown"
 chmod 755 "$ROOT_FS_DIR/etc/init.d/network"
@@ -119,57 +135,84 @@ else
 fi
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
+# Copies the profile directory to the /etc directory.
+[ -d "$PROFILE_DIR" ] && cp -drpT "$PROFILE_DIR" "$ROOT_FS_DIR/etc"
 
-echo "$ETC_HOSTNAME" > "$ROOT_FS_DIR/etc/hostname"
-cat "$ROOT_FS_DIR/etc/fstab.head" > "$ROOT_FS_DIR/etc/fstab"
-ROOT_FS_OPTS=defaults
+#
+# A /etc directory.
+#
+
 [ $READ_ONLY = true ] && ROOT_FS_OPTS=ro
-if [ $ISO != true ]; then
-	cat >> "$ROOT_FS_DIR/etc/fstab" << EOT
-/dev/root	/		ext2		$ROOT_FS_OPTS	0	1
+if [ ! -e "$ROOT_FS_DIR/etc/fstab" ]; then
+	cat "$ROOT_FS_DIR/etc/fstab.head" > "$ROOT_FS_DIR/etc/fstab"
+	ROOT_FS_OPTS=defaults
+	cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
+/dev/root	/		$ROOT_FS_TYPE		$ROOT_FS_OPTS	0	1
 EOT
-else
-	cat >> "$ROOT_FS_DIR/etc/fstab" << EOT
-/dev/root	/		iso9660		$ROOT_FS_OPTS	0	0
-EOT
-fi
-if [ $READ_ONLY = true ]; then
-	cat >> "$ROOT_FS_DIR/etc/fstab" << EOT
+	if [ $READ_ONLY = true ]; then
+		cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
 tmpfs		/root		tmpfs		mode=755	0	0
 tmpfs		/home/child	tmpfs		uid=1000,gid=1000,mode=755	0	0	
 tmpfs		/tmp		tmpfs		mode=1777	0	0
 tmpfs		/var		tmpfs		mode=755	0	0
 EOT
+	fi
+	cat "$ROOT_FS_DIR/etc/fstab.tail" >> "$ROOT_FS_DIR/etc/fstab"
 fi
-cat "$ROOT_FS_DIR/etc/fstab.tail" >> "$ROOT_FS_DIR/etc/fstab"
-
 if [ $READ_ONLY != true ]; then
 	echo -n > "$ROOT_FS_DIR/etc/mtab"
 else
 	ln -sf /proc/mounts "$ROOT_FS_DIR/etc/mtab"
 	ln -sf /var/etc/resolv.conf "$ROOT_FS_DIR/etc/resolv.conf"
 fi
+
+#
+# A /sbin directory.
+#
+
 mkdir -p "$ROOT_FS_DIR/sbin"
 chmod 755 "$ROOT_FS_DIR/etc/dhclient-script"
 ln -sf /etc/dhclient-script "$ROOT_FS_DIR/sbin/dhclient-script"
 
+#
+# A kernel and a /boot/ directory.
+#
+
 K_PKG_ROOT_DIR="$ROOT_FS_DIR"
 install_kernel_package
-if [ $ISO = true ]; then
+if [ NO_BOOT != true ]; then
 	case "$ARCH" in
 		i[3-9]86|x86_64)
+			if [ $IS_ROOT_DEV != true ]; then
+				if [ $ISO != true ]; then
+					ROOT_DEV=/dev/sda1
+				else
+					ROOT_DEV=/dev/sr0
+				fi
+			fi
 			mkdir -p "$ROOT_FS_DIR/boot/grub" 
 			cat > "$ROOT_FS_DIR/boot/grub/menu.lst" <<EOT
 default 0
 timeout 0
 hiddenmenu
 title Toyroot
-	kernel $K_PKG_KERNEL_FILE root=/dev/sr0 devtmpfs.mount=1
+	kernel $K_PKG_KERNEL_FILE root=$ROOT_DEV rootfstype=$ROOT_FS_TYPE devtmpfs.mount=1
 EOT
-			cp -dp "bin/$ARCH/grub/usr/lib/grub/$ARCH-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
+			if [ $ISO != true ]; then
+				for name in stage1 e2fs_stage1_5 stage2; do
+					cp -dp "bin/$ARCH/grub/usr/lib/grub/$ARCH-pc/$name" "$ROOT_FS_DIR/boot/grub"
+				done
+			else
+				cp -dp "bin/$ARCH/grub/usr/lib/grub/$ARCH-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
+			fi
 			;;
-	esac
+		esac
 fi
+
+#
+# Packages.
+#
+
 NX_PKG_ROOT_DIR="$ROOT_FS_DIR"
 install_non_extra_packages
 if [ "$PKG_SUFFIXES" != "" ]; then
@@ -182,6 +225,10 @@ PKG_ROOT_DIR="$ROOT_FS_DIR"
 process_extra_packages install_extra_package
 select_programs
 install_all_infos
+
+#
+# A root image.
+#
 
 if [ $ISO != true ]; then
 	genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"
