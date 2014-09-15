@@ -206,7 +206,7 @@ EOT
 				cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
 			fi
 			;;
-		esac
+	esac
 fi
 
 #
