@@ -200,10 +200,10 @@ title Toyroot
 EOT
 			if [ $ISO != true ]; then
 				for name in stage1 e2fs_stage1_5 stage2; do
-					cp -dp "bin/$ARCH/grub/usr/lib/grub/$ARCH-pc/$name" "$ROOT_FS_DIR/boot/grub"
+					cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/$name" "$ROOT_FS_DIR/boot/grub"
 				done
 			else
-				cp -dp "bin/$ARCH/grub/usr/lib/grub/$ARCH-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
+				cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
 			fi
 			;;
 		esac

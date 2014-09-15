@@ -1,0 +1,11 @@
+--- old/grub-0.97/stage1/Makefile.in	2005-05-08 04:42:36.000000000 +0200
++++ new/grub-0.97/stage1/Makefile.in	2014-09-15 23:30:32.050551634 +0200
+@@ -165,7 +165,7 @@
+ exec_prefix = @exec_prefix@
+ host = @host@
+ host_alias = @host_alias@
+-host_cpu = @host_cpu@
++host_cpu = i386
+ host_os = @host_os@
+ host_vendor = @host_vendor@
+ includedir = @includedir@
