@@ -40,7 +40,7 @@ FS_SIZE=65536
 FS_INODES=32768
 ROOT_DEV=""
 IS_ROOT_DEV=false
-ISO=false
+ROOT_FS_KIND=rootfs
 READ_ONLY=false
 NO_BOOT=false
 NO_KERNEL=false
@@ -76,8 +76,11 @@ while [ $# -gt 0 ]; do
 			ROOT_DEV="`echo "$1" | sed 's/^[^=]*=//'`"
 			IS_ROOT_DEV=true
 			;;
+		--initrd)
+			ROOT_FS_KIND=initrd
+			;;
 		--iso)
-			ISO=true
+			ROOT_FS_KIND=iso
 			;;
 		--read-only)
 			READ_ONLY=true
@@ -95,23 +98,24 @@ while [ $# -gt 0 ]; do
 	shift
 done
 if [ $IS_NAME != true ]; then
-	if [ $ISO != true ]; then
-		NAME=root
-	else
-		NAME=iso
-	fi
+	case $ROOT_FS_KIND in
+		initrd)	NAME=initrd;;
+		iso)	NAME=iso;;
+		*)	NAME=root;;
+	esac
 fi
 PKG_SUFFIXES="`echo "$PKG_SUFFIXES" | sed 's/,/ /g'`"
-[ $ISO = true ] && READ_ONLY=true
+[ $ROOT_FS_KIND = iso ] && READ_ONLY=true
+[ $ROOT_FS_KIND = initrd ] && NO_KERNEL=true
 [ "$PKGS" = "" -a $ALL_PKGS != true ] && PKGS="$PKGS `cat package_list.txt`"
 
 ROOT_FS_DIR="dist/$ARCH/fs/$NAME"
 ROOT_FS_IMG="dist/$ARCH/fs/$NAME.img"
-if [ $ISO != true ]; then
-	ROOT_FS_TYPE=ext2
-else
-	ROOT_FS_TYPE=iso9660
-fi
+case $ROOT_FS_KIND in
+	initrd)	ROOT_FS_TYPE=rootfs;;
+	iso)	ROOT_FS_TYPE=iso9660;;
+	*)	ROOT_FS_TYPE=ext2;;
+esac
 PROFILE_DIR="profile/$NAME"
 
 #
@@ -119,6 +123,7 @@ PROFILE_DIR="profile/$NAME"
 #
 
 mkdir -p "$ROOT_FS_DIR"
+[ $ROOT_FS_KIND = initrd ] && ln -sf /sbin/init "$ROOT_FS_DIR/init"
 cp -drp etc "$ROOT_FS_DIR"
 chmod 755 "$ROOT_FS_DIR/etc/rcS"
 chmod 755 "$ROOT_FS_DIR/etc/rc.shutdown"
@@ -150,9 +155,15 @@ mkdir -p "$ROOT_FS_DIR/home/child"
 if [ ! -e "$ROOT_FS_DIR/etc/fstab" ]; then
 	cat "$ROOT_FS_DIR/etc/fstab.head" > "$ROOT_FS_DIR/etc/fstab"
 	ROOT_FS_OPTS=defaults
-	cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
+	if [ $ROOT_FS_KIND != initrd ]; then
+		cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
 /dev/root	/		$ROOT_FS_TYPE		$ROOT_FS_OPTS	0	1
 EOT
+	else
+		cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
+rootfs		/		$ROOT_FS_TYPE		$ROOT_FS_OPTS	0	1
+EOT
+	fi
 	if [ $READ_ONLY = true ]; then
 		cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
 tmpfs		/root		tmpfs		mode=755	0	0
@@ -189,7 +200,7 @@ if [ $NO_KERNEL != true ]; then
 		case "$ARCH" in
 			i[3-9]86|x86_64)
 				if [ $IS_ROOT_DEV != true ]; then
-					if [ $ISO != true ]; then
+					if [ $ROOT_FS_KIND != iso ]; then
 						ROOT_DEV=/dev/sda1
 					else
 						ROOT_DEV=/dev/sr0
@@ -203,7 +214,7 @@ hiddenmenu
 title Toyroot
 	kernel $K_PKG_KERNEL_FILE root=$ROOT_DEV rootfstype=$ROOT_FS_TYPE devtmpfs.mount=1
 EOT
-				if [ $ISO != true ]; then
+				if [ $ROOT_FS_KIND != iso ]; then
 					for name in stage1 e2fs_stage1_5 stage2; do
 						cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/$name" "$ROOT_FS_DIR/boot/grub"
 					done
@@ -236,15 +247,29 @@ install_all_infos
 # A root image.
 #
 
-if [ $ISO != true ]; then
-	genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"
-else
-	MKISOFS_OPTS_ARCH=""
-	case "$ARCH" in
-		i[3-9]86|x86_64)
-			MKISOFS_OPTS_ARCH="-b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table"
-			;;
-	esac
-	mkisofs -r $MKISOFS_OPTS_ARCH -o "$ROOT_FS_IMG" "$ROOT_FS_DIR"
-fi
+case $ROOT_FS_KIND in
+	initrd)
+		chmod 1777 "$ROOT_FS_DIR/tmp"
+		SAVED_PWD="`pwd`"
+		cd "$ROOT_FS_DIR"
+		find ./ | sed '/.\/home\/child/d' | cpio -H newc -R 0:0 -o > "$SAVED_PWD/dist/$ARCH/fs/$NAME.tmp"
+		echo ./home/child | cpio -A -H newc -R 1000:1000 -F "$SAVED_PWD/dist/$ARCH/fs/$NAME.tmp" -o
+		cd "$SAVED_PWD"
+		cat "dist/$ARCH/fs/$NAME.tmp" | gzip -9c > "$SAVED_PWD/$ROOT_FS_IMG"
+		rm -f "dist/$ARCH/fs/$NAME.tmp"
+		chmod 755 "$ROOT_FS_DIR/tmp"
+		;;
+	iso)
+		MKISOFS_OPTS_ARCH=""
+		case "$ARCH" in
+			i[3-9]86|x86_64)
+				MKISOFS_OPTS_ARCH="-b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table"
+				;;
+		esac
+		mkisofs -r $MKISOFS_OPTS_ARCH -o "$ROOT_FS_IMG" "$ROOT_FS_DIR"
+		;;
+	*)
+		genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"
+		;;
+esac
 exit 0

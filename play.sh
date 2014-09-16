@@ -28,7 +28,7 @@
 
 NAME=""
 IS_NAME=false
-PLAY_TYPE=fs
+PLAY_KIND=rootfs
 ARCH=""
 IS_ARCH=false
 MACHINE=""
@@ -40,10 +40,13 @@ while [ $# -gt 0 ]; do
 			IS_NAME=true
 			;;
 		--disk)
-			PLAY_TYPE=disk
+			PLAY_KIND=disk
+			;;
+		--initrd)
+			PLAY_KIND=initrd
 			;;
 		--iso)
-			PLAY_TYPE=iso
+			PLAY_KIND=iso
 			;;
 		*)
 			if [ $IS_ARCH != true ]; then
@@ -58,30 +61,40 @@ while [ $# -gt 0 ]; do
 	shift
 done
 if [ $IS_NAME != true ]; then
-	if [ $PLAY_TYPE != iso ]; then
-		NAME=root
-	else
-		NAME=iso
-	fi
+	case $PLAY_KIND in
+		initrd)	NAME=initrd;;
+		iso)	NAME=iso;;
+		*)	NAME=root;
+	esac
 fi
 [ $IS_ARCH != true ] && ARCH="`arch`"
 
 case "$ARCH" in
 	arm)
 		[ $IS_MACHINE != true ] && MACHINE=vexpress-a9
-		qemu-system-arm -M "$MACHINE" -drive file=dist/arm/fs/$NAME.img,if=sd -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
+		case $PLAY_KIND in
+			initrd)
+				qemu-system-arm -M "$MACHINE" -kernel bin/arm/linux/zImage -append "logo.nologo devtmpfs.mount=1" -initrd "dist/arm/fs/$NAME.img"
+				;;
+			*)
+				qemu-system-arm -M "$MACHINE" -drive "file=dist/arm/fs/$NAME.img,if=sd" -kernel bin/arm/linux/zImage -append "root=/dev/mmcblk0 logo.nologo devtmpfs.mount=1"
+				;;
+		esac
 		;;
 	x86_64)
 		[ $IS_MACHINE != true ] && MACHINE=pc-1.0
-		case $PLAY_TYPE in
+		case $PLAY_KIND in
 			disk)
-				qemu-system-x86_64 -M "$MACHINE" -boot c -hda dist/x86_64/disk/$NAME.img -netdev user,id=mynet -device e1000,netdev=mynet
+				qemu-system-x86_64 -M "$MACHINE" -boot c -hda "dist/x86_64/disk/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
+				;;
+			initrd)
+				qemu-system-x86_64 -M "$MACHINE" -kernel bin/x86_64/linux/bzImage -append "devtmpfs.mount=1" -initrd "dist/x86_64/fs/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			iso)
-				qemu-system-x86_64 -M "$MACHINE" -boot d -cdrom dist/x86_64/fs/$NAME.img -netdev user,id=mynet -device e1000,netdev=mynet
+				qemu-system-x86_64 -M "$MACHINE" -boot d -cdrom "dist/x86_64/fs/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			*)
-				qemu-system-x86_64 -M "$MACHINE" -hda dist/x86_64/fs/$NAME.img -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
+				qemu-system-x86_64 -M "$MACHINE" -hda "dist/x86_64/fs/$NAME.img" -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			
 		esac

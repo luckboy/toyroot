@@ -2,6 +2,7 @@
 echo "Starting Toyroot ..."
 
 echo "Mounting filesystems ..."
+mountpoint -q /dev || mount -n /dev
 mknod /dev/root b "`mountpoint -dq / | cut -d : -f 1`" "`mountpoint -dq / | cut -d : -f 2`"
 chmod 600 /dev/root
 mount -n -o remount /

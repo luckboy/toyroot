@@ -407,8 +407,8 @@ select_programs() {
 			break
 		fi
 	done
-	"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" cc gcc
-	"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" c++ g++
+	[ -x "$PKG_ROOT_DIR/usr/bin/gcc" ] && "bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" cc gcc
+	[ -x "$PKG_ROOT_DIR/usr/bin/g++" ] && "bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" c++ g++
 	for p in nawk mawk gawk; do
 		if [ -x "$PKG_ROOT_DIR/usr/bin/$p" ]; then
 			"bin/$ARCH/toyroot-utils/usr/bin/selectprog" --root-dir="$PKG_ROOT_DIR" awk "$p"
@@ -420,7 +420,9 @@ select_programs() {
 install_all_infos() {
 	local INSTALL_INFO=install-info
 	which ginstall-info > /dev/null && INSTALL_INFO=ginstall-info
-	for i in "$PKG_ROOT_DIR/usr/share/info"/*; do
-		"$INSTALL_INFO" --info-dir="$PKG_ROOT_DIR/usr/share/info" --info-file="$i"
-	done
+	if [ -d $PKG_ROOT_DIR/usr/share/info ]; then
+		for i in "$PKG_ROOT_DIR/usr/share/info"/*; do
+			"$INSTALL_INFO" --info-dir="$PKG_ROOT_DIR/usr/share/info" --info-file="$i"
+		done
+	fi
 }
