@@ -43,6 +43,7 @@ IS_ROOT_DEV=false
 ISO=false
 READ_ONLY=false
 NO_BOOT=false
+NO_KERNEL=false
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--name=*)
@@ -83,6 +84,9 @@ while [ $# -gt 0 ]; do
 			;;
 		--no-boot)
 			NO_BOOT=true
+			;;
+		--no-kernel)
+			NO_KERNEL=true
 			;;
 		*)
 			PKGS="$PKGS $1"
@@ -178,35 +182,37 @@ ln -sf /etc/dhclient-script "$ROOT_FS_DIR/sbin/dhclient-script"
 # A kernel and a /boot/ directory.
 #
 
-K_PKG_ROOT_DIR="$ROOT_FS_DIR"
-install_kernel_package
-if [ NO_BOOT != true ]; then
-	case "$ARCH" in
-		i[3-9]86|x86_64)
-			if [ $IS_ROOT_DEV != true ]; then
-				if [ $ISO != true ]; then
-					ROOT_DEV=/dev/sda1
-				else
-					ROOT_DEV=/dev/sr0
+if [ $NO_KERNEL != true ]; then
+	K_PKG_ROOT_DIR="$ROOT_FS_DIR"
+	install_kernel_package
+	if [ $NO_BOOT != true ]; then
+		case "$ARCH" in
+			i[3-9]86|x86_64)
+				if [ $IS_ROOT_DEV != true ]; then
+					if [ $ISO != true ]; then
+						ROOT_DEV=/dev/sda1
+					else
+						ROOT_DEV=/dev/sr0
+					fi
 				fi
-			fi
-			mkdir -p "$ROOT_FS_DIR/boot/grub" 
-			cat > "$ROOT_FS_DIR/boot/grub/menu.lst" <<EOT
+				mkdir -p "$ROOT_FS_DIR/boot/grub" 
+				cat > "$ROOT_FS_DIR/boot/grub/menu.lst" <<EOT
 default 0
 timeout 0
 hiddenmenu
 title Toyroot
 	kernel $K_PKG_KERNEL_FILE root=$ROOT_DEV rootfstype=$ROOT_FS_TYPE devtmpfs.mount=1
 EOT
-			if [ $ISO != true ]; then
-				for name in stage1 e2fs_stage1_5 stage2; do
-					cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/$name" "$ROOT_FS_DIR/boot/grub"
-				done
-			else
-				cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
-			fi
-			;;
-	esac
+				if [ $ISO != true ]; then
+					for name in stage1 e2fs_stage1_5 stage2; do
+						cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/$name" "$ROOT_FS_DIR/boot/grub"
+					done
+				else
+					cp -dp "bin/$ARCH/grub/usr/lib/grub/i386-pc/stage2_eltorito" "$ROOT_FS_DIR/boot/grub"
+				fi
+				;;
+		esac
+	fi
 fi
 
 #

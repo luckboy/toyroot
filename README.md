@@ -28,6 +28,7 @@ The built system contains the following core packages:
   * util-linux-mount (mount and umount)
   * uClibc++-build (only to build)
   * shadow-login (login)
+  * grub-host (grub for host)
 
 You can choose packages by editing of the package_list.txt file. The packages.txt file contains the descriptions
 of all extra packages which may be in built system.
@@ -48,7 +49,8 @@ This build system contains scripts:
   * kernel.sh - compile kernel
   * toys.sh - compile programs (toys)
   * rootfs.sh - generate root file system
-  * play.sh - run built system on qemu emulator 
+  * disk.sh - generate disk image
+  * play.sh - run built system on qemu emulator
   * clean.sh - remove work directories without sources
 
 ## Directories
@@ -64,10 +66,30 @@ After compilation, this directory also contains the subdirectories:
   * build - building directory
   * bin - directory of binary packages
   * kernel_config -  directory of kernel configurations
+  * profile - directory of system configuration for specified profiles
 
 After generating of root file system, the directory also contains the subdirectory:
 
   * dist - directory with root file system directory and image of root file system
+
+## Profiles
+
+Profles allow you to build many systems. The `rootfs.sh` script and the `disk.sh` script  generate the root file
+system and the disk image for the specified profile. Any profile can have the root file system and/or the disk image.
+The profile is specified by pass the `--name` option with the profile name. You can build the system for
+own profile, and then run this system by invoke commands: 
+
+        ./rootfs.sh --name=myprofile # generate root file system for your profile
+        ./disk.sh --name=myprofile # generate disk image for your profile
+        ./play --name=myprofile --disk # run system on disk image for your profile
+
+You also create the specific files of the /etc directory for any profile. Any profile can have the system configuration at the profile/&lt;profile name&gt; directory. This build system has two default profiles:
+
+  * root - profile for hard disk
+  * iso - profile for CDROM
+
+Example:
+
 
 ## Compilation of kernel
 
@@ -127,6 +149,7 @@ Usage of this script:
 
 Options of this script:
 
+        --name=<name>                   specify the profile name.
         --pkg-list-file[=<list file>]   add packages to the root file system from a list file (default:
                                         package-list.txt).
         --all-pkgs                      generate the root file system with all packages.
@@ -134,11 +157,41 @@ Options of this script:
         --pkg-suffixes=<suffix>,...     add additional packages with specified suffixes onto the root
                                         file system.
         --fs-size=<size>                specify the size of the root file system in blocks.
-        --fs-inodes=<nodes>             specify the number of i-nodes of the root file system. 
+        --fs-inodes=<nodes>             specify the number of i-nodes of the root file system.
+        --root-dev=<device>             specify the device of the root file system.
+        --iso                           generate the root file system for CDROM.
+        --read-only                     generate the read-only root file system.
+        --no-boot                       don't copy the bootloader files to the root file system and
+                                        don't install the bootloader for CDROM.
+        --no-kernel                     don't copy the kernel to the root file system.
 
 Example:
 
         ARCH=arm ./toys.sh # generate root file system for ARM
+
+## Generating of disk image
+
+You can generate disk image with built system by invoke ./disk.sh. This script generates the disk image from
+the generated root file system.
+
+Usage of this script:
+
+        [ARCH=<architecture>] ./disk.sh
+
+Options of the script:
+
+        --name=<name>                   specify the profile name.
+        --disk-size=<size>              specify the size of the disk image in sectors.
+        --fs-size=<size>                specify the size of the root file system in sectors.
+        --cylinders=<cylinders>         specify the cylinders of the disk.
+        --heads=<heads>                 specify the heads of the disk.
+        --sectors=<sectors>             specify the sectors of the disk.
+        --grub-dev=<decive>             specify the disk device for grub (default: (hd0)).
+        --no-boot                       don't install bootloader on the disk image.
+
+Example:
+
+        ./disk.sh # generate disk image.
 
 ## Running of system
 
@@ -147,6 +200,12 @@ If you want run your system on qemu emulator, you can do it by invoke `./play.sh
 Usage of this script:
 
         ./play.sh <architecture> [<machine for qemu>]
+
+Options of this script:
+
+         --name=<name>                  specify the profile name.
+         --disk                         run system from disk image (only for x86_64).
+         --iso                          run system from CDROM image (only for x86_64).
     
 Example:
 

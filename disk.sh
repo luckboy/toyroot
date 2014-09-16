@@ -40,6 +40,7 @@ ARE_HEADS=false
 SECTORS=""
 ARE_SECTORS=false
 GRUB_DEV="(hd0)"
+NO_BOOT=false
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--name=*)
@@ -68,6 +69,9 @@ while [ $# -gt 0 ]; do
 		--grub-dev=*)
 			GRUB_DEV="`echo "$1" | sed 's/^[^=]*=//'`"
 			;;
+		--no-boot)
+			NO_BOOT=true
+			;;
 	esac
 	shift
 done
@@ -75,35 +79,40 @@ done
 DISK_IMG="dist/$ARCH/disk/$NAME.img"
 FS_IMG="dist/$ARCH/fs/$NAME.img"
 
-case "$ARCH" in
-	i[3-6]86|x86_64)
-		mkdir -p "dist/$ARCH/disk"
-		if [ $IS_DISK_SIZE != true ]; then
-			FS_SIZE_IN_K="`stat -c '%s' "$FS_IMG"`"
-			FS_SIZE="`expr "$FS_SIZE_IN_K" / 512 + \( "$FS_SIZE_IN_K" % 512 != 0 \)`"
-		fi
-		if [ $IS_DISK_SIZE != true ]; then
-			if [ $ARE_CYLINDERS = true -a $ARE_HEADS = true -a $ARE_SECTORS = true ]; then
-				DISK_SIZE="`expr "$CYLINDERS" \* "$HEADS" \* "$SECTORS"`"
-			else
-				TMP_DISK_SIZE="`expr "$FS_SIZE" + 2048`"
-				CYLINDERS="`expr "$TMP_DISK_SIZE" / 16065 + \( "$TMP_DISK_SIZE" % 16065 != 0 \)`"
-				HEADS=255
-				SECTORS=63
-				DISK_SIZE="`expr "$CYLINDERS" \* "$HEADS" \* "$SECTORS"`"
-			fi
-		fi
-		dd if=/dev/zero of="$DISK_IMG" bs=512 count="$DISK_SIZE"
-		(echo "2048 " | sfdisk -C "$CYLINDERS" -H "$HEADS" -S "$SECTORS" -u S "$DISK_IMG") || exit 1
-		dd if="$FS_IMG" of="$DISK_IMG" bs=512 seek=2048 count="$FS_SIZE" conv=notrunc
-		GRUB_PART_DEV="`echo "$GRUB_DEV" | sed 's/[)]$/,0\)/'`"
-		("./bin/$ARCH/grub-host/sbin/grub" --batch <<EOT
+mkdir -p "dist/$ARCH/disk"
+if [ $IS_DISK_SIZE != true ]; then
+	FS_SIZE_IN_K="`stat -c '%s' "$FS_IMG"`"
+	FS_SIZE="`expr "$FS_SIZE_IN_K" / 512 + \( "$FS_SIZE_IN_K" % 512 != 0 \)`"
+fi
+if [ $IS_DISK_SIZE != true ]; then
+	if [ $ARE_CYLINDERS = true -a $ARE_HEADS = true -a $ARE_SECTORS = true ]; then
+		DISK_SIZE="`expr "$CYLINDERS" \* "$HEADS" \* "$SECTORS"`"
+	else
+		TMP_DISK_SIZE="`expr "$FS_SIZE" + 2048`"
+		CYLINDERS="`expr "$TMP_DISK_SIZE" / 16065 + \( "$TMP_DISK_SIZE" % 16065 != 0 \)`"
+		HEADS=255
+		SECTORS=63
+		DISK_SIZE="`expr "$CYLINDERS" \* "$HEADS" \* "$SECTORS"`"
+	fi
+fi
+dd if=/dev/zero of="$DISK_IMG" bs=512 count="$DISK_SIZE"
+SFDISK_INPUT="2028,,,*"
+[ $NO_BOOT = true ] && SFDISK_INPUT="2028"
+(echo "2048,,,*" | sfdisk -C "$CYLINDERS" -H "$HEADS" -S "$SECTORS" -u S "$DISK_IMG") || exit 1
+dd if="$FS_IMG" of="$DISK_IMG" bs=512 seek=2048 count="$FS_SIZE" conv=notrunc
+
+if [ $NO_BOOT != true ]; then
+	case "$ARCH" in
+		i[3-6]86|x86_64)
+			GRUB_PART_DEV="`echo "$GRUB_DEV" | sed 's/[)]$/,0\)/'`"
+			("./bin/$ARCH/grub-host/sbin/grub" --batch <<EOT
 device $GRUB_DEV $DISK_IMG
 root $GRUB_PART_DEV
 setup $GRUB_DEV
 quit
 EOT
 ) || exit 1
-		;;
-esac
+			;;
+	esac
+fi
 exit 0
