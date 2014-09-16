@@ -83,9 +83,10 @@ own profile, and then run this system by invoke commands:
         ./disk.sh --name=myprofile # generate disk image for your profile
         ./play --name=myprofile --disk # run system on disk image for your profile
 
-You also create the specific files of the /etc directory for any profile. Any profile can have the system configuration at the profile/&lt;profile name&gt; directory. This build system has two default profiles:
+You also create the specific files of the /etc directory for any profile. Any profile can have the system configuration at the profile/&lt;profile name&gt; directory. This build system has three default profiles:
 
   * root - profile for hard disk
+  * initrd - profile for initrd
   * iso - profile for CDROM
 
 Example:
@@ -103,9 +104,10 @@ Usage of this script:
 Options of this scirpt:
 
         --custom-config                 compile with the custom configuration. If the custom 
-                                        configuration is nonexistent, this script invokes the manual 
-                                        configuration with the default settings.
-        --only-custom-config            same as --custom-config but without the default settings.
+                                        configuration is nonexistent, this script invokes 
+                                        the manual configuration with the default settings.
+        --only-custom-config            same as --custom-config but without the default
+                                        settings.
         --force-menuconfig              force the manual configuration.
 
 Example:
@@ -126,8 +128,8 @@ Usage of this script:
 
 Options of this script:
 
-        --pkg-list-file[=<list file>]   add packages to compilation from a list file (default: 
-                                        package-list.txt).
+        --pkg-list-file[=<list file>]   add packages to compilation from a list file
+                                        (default: package-list.txt).
         --all-pkgs                      compile all packages.
         --no-extra-pkgs                 just compile non-extra packages.
 
@@ -150,19 +152,22 @@ Usage of this script:
 Options of this script:
 
         --name=<name>                   specify the profile name.
-        --pkg-list-file[=<list file>]   add packages to the root file system from a list file (default:
-                                        package-list.txt).
+        --pkg-list-file[=<list file>]   add packages to the root file system from a list 
+                                        file (default: package-list.txt).
         --all-pkgs                      generate the root file system with all packages.
-        --no-extra-pkgs                 generate the root file system with only non-extra packages.
-        --pkg-suffixes=<suffix>,...     add additional packages with specified suffixes onto the root
-                                        file system.
+        --no-extra-pkgs                 generate the root file system with only non-extra 
+                                        packages.
+        --pkg-suffixes=<suffix>,...     add additional packages with specified suffixes onto
+                                        the root file system.
         --fs-size=<size>                specify the size of the root file system in blocks.
-        --fs-inodes=<nodes>             specify the number of i-nodes of the root file system.
+        --fs-inodes=<nodes>             specify the number of i-nodes of the root file
+                                        system.
         --root-dev=<device>             specify the device of the root file system.
+        --initrd                        generate the root file system for initrd.
         --iso                           generate the root file system for CDROM.
         --read-only                     generate the read-only root file system.
-        --no-boot                       don't copy the bootloader files to the root file system and
-                                        don't install the bootloader for CDROM.
+        --no-boot                       don't copy the bootloader files to the root file 
+                                        system and don't install the bootloader for CDROM.
         --no-kernel                     don't copy the kernel to the root file system.
 
 Example:
@@ -205,6 +210,7 @@ Options of this script:
 
          --name=<name>                  specify the profile name.
          --disk                         run system from disk image (only for x86_64).
+         --initrd                       run system from initrd file system.
          --iso                          run system from CDROM image (only for x86_64).
     
 Example:
