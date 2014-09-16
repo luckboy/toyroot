@@ -365,8 +365,8 @@ case "$ARCH" in
 			cd "build/$ARCH/grub-host/grub-$GRUB_VERSION"
 			[ -f Makefile ] && make clean
 			(OBJCOPY="$OBJCOPY -R .note.gnu.build-id" ./configure --host="$HOST" --prefix="$ROOT_DIR/bin/$ARCH/grub-host" --cache-file=config.cache && make install) || exit 1
-			rm -f "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/$ARCH-pc"/*
-			cp -dp "$ROOT_DIR/bin/$ARCH/grub/usr/lib/grub/$ARCH-pc"/* "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/$ARCH-pc"
+			rm -f "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/i386-pc"/*
+			cp -dp "$ROOT_DIR/bin/$ARCH/grub/usr/lib/grub/i386-pc"/* "$ROOT_DIR/bin/$ARCH/grub-host/lib/grub/i386-pc"
 			cd ../../../..
 			echo -n > "bin/$ARCH/grub-host.nonextra"
 		fi
