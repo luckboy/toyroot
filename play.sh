@@ -33,6 +33,8 @@ ARCH=""
 IS_ARCH=false
 MACHINE=""
 IS_MACHINE=false
+VIDEO=""
+IS_VIDEO=false
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--name=*)
@@ -47,6 +49,14 @@ while [ $# -gt 0 ]; do
 			;;
 		--iso)
 			PLAY_KIND=iso
+			;;
+		--video)
+			VIDEO=cirrusfb:800x600-16
+			IS_VIDEO=true
+			;;
+		--video=*)
+			VIDEO="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_VIDEO=true
 			;;
 		*)
 			if [ $IS_ARCH != true ]; then
@@ -83,18 +93,20 @@ case "$ARCH" in
 		;;
 	x86_64)
 		[ $IS_MACHINE != true ] && MACHINE=pc-1.0
+		KERNEL_ARG_VIDEO=""
+		[ $IS_VIDEO = true ] && KERNEL_ARG_VIDEO="video=$VIDEO"
 		case $PLAY_KIND in
 			disk)
 				qemu-system-x86_64 -M "$MACHINE" -boot c -hda "dist/x86_64/disk/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			initrd)
-				qemu-system-x86_64 -M "$MACHINE" -kernel bin/x86_64/linux/bzImage -append "devtmpfs.mount=1" -initrd "dist/x86_64/fs/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
+				qemu-system-x86_64 -M "$MACHINE" -kernel bin/x86_64/linux/bzImage -append "logo.nologo devtmpfs.mount=1 $KERNEL_ARG_VIDEO" -initrd "dist/x86_64/fs/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			iso)
 				qemu-system-x86_64 -M "$MACHINE" -boot d -cdrom "dist/x86_64/fs/$NAME.img" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			*)
-				qemu-system-x86_64 -M "$MACHINE" -hda "dist/x86_64/fs/$NAME.img" -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 devtmpfs.mount=1" -netdev user,id=mynet -device e1000,netdev=mynet
+				qemu-system-x86_64 -M "$MACHINE" -hda "dist/x86_64/fs/$NAME.img" -kernel bin/x86_64/linux/bzImage -append "root=/dev/sda rootfstype=ext2 logo.nologo devtmpfs.mount=1 $KERNEL_ARG_VIDEO" -netdev user,id=mynet -device e1000,netdev=mynet
 				;;
 			
 		esac

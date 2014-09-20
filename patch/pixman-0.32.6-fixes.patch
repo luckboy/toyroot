@@ -1,0 +1,12 @@
+diff -Naur old/pixman-0.32.6/configure new/pixman-0.32.6/configure
+--- old/pixman-0.32.6/configure	2014-07-06 00:54:03.000000000 +0200
++++ new/pixman-0.32.6/configure	2014-09-17 22:00:43.413851885 +0200
+@@ -14157,6 +14157,8 @@
+ 	LIBS="$save_LIBS"
+ 
+     fi
++    
++    support_for_pthreads=no
+ 
+     if test "z$support_for_pthreads" != "zyes"; then
+ 		save_CFLAGS="$CFLAGS"

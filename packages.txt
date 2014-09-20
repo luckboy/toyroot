@@ -1,4 +1,4 @@
-# <name>	<version>	<extension>	<download url>							<src_format>	<build dir format>
+# <name>	<version>	<extension>	<download url>							<src format>	<build dir format>	<named src format>
 iputils
 dhcp
 util-linux
@@ -39,3 +39,18 @@ make		4.0		tar.bz2		http://ftp.gnu.org/gnu/make
 m4		1.4.17		tar.xz		http://ftp.gnu.org/gnu/m4
 autoconf	2.69		tar.xz		http://ftp.gnu.org/gnu/autoconf
 automake	1.14.1		tar.xz		http://ftp.gnu.org/gnu/automake
+expat		2.1.0		tar.gz		http://cznic.dl.sourceforge.net/project/expat/expat/2.1.0
+libffi		3.1		tar.gz		ftp://sourceware.org/pub/libffi
+wayland		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
+mtdev		1.1.5		tar.bz2		http://bitmath.org/code/mtdev
+eudev		1.9		tar.gz		http://dev.gentoo.org/~blueness/eudev
+libpng		1.6.13		tar.xz		http://skylink.dl.sourceforge.net/project/libpng/libpng16/1.6.13
+pixman		0.32.6		tar.gz		http://cairographics.org/releases
+jpeg		9a		tar.gz		http://ijg.org/files/						%psrc.v%v.%e	%p-%v
+freetype	2.5.3		tar.bz2		http://softlayer-ams.dl.sourceforge.net/project/freetype/freetype2/2.5.3
+cairo		1.12.16		tar.xz		http://cairographics.org/releases
+libxkbcommon	0.4.3		tar.xz		http://xkbcommon.org/download
+xkeyboard-config 2.11		tar.bz2		http://www.x.org/releases/individual/data/xkeyboard-config
+#Linux-PAM	1.1.8		tar.bz2		http://www.linux-pam.org/library
+openpam		20140912	tar.gz		http://kent.dl.sourceforge.net/project/openpam/openpam/Ourouparia
+weston		1.5.93		tar.xz		http://wayland.freedesktop.org/releases

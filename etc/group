@@ -1,3 +1,4 @@
 root:x:0:
 tty:x:5:
+weston-launch:x:101:child
 child:x:1000:

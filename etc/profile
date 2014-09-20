@@ -1,2 +1,3 @@
 export PATH=/sbin:/usr/sbin:/bin:/usr/bin
-set -o emacs
+export XDG_RUNTIME_DIR=/xdg
+export ENV=/etc/shinit

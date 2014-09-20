@@ -1,0 +1,57 @@
+diff -Naur old/weston-1.5.93/Makefile.in new/weston-1.5.93/Makefile.in
+--- old/weston-1.5.93/Makefile.in	2014-09-12 11:45:49.000000000 +0200
++++ new/weston-1.5.93/Makefile.in	2014-09-20 16:52:47.667356051 +0200
+@@ -5926,7 +5926,6 @@
+ .FORCE :
+ 
+ @BUILD_WESTON_LAUNCH_TRUE@@ENABLE_SETUID_INSTALL_TRUE@install-exec-hook:
+-@BUILD_WESTON_LAUNCH_TRUE@@ENABLE_SETUID_INSTALL_TRUE@	chown root $(DESTDIR)$(bindir)/weston-launch
+ @BUILD_WESTON_LAUNCH_TRUE@@ENABLE_SETUID_INSTALL_TRUE@	chmod u+s $(DESTDIR)$(bindir)/weston-launch
+ 
+ clean-local:
+diff -Naur old/weston-1.5.93/src/weston-launch.c new/weston-1.5.93/src/weston-launch.c
+--- old/weston-1.5.93/src/weston-launch.c	2014-01-13 15:01:49.000000000 +0100
++++ new/weston-1.5.93/src/weston-launch.c	2014-09-20 17:25:18.103327097 +0200
+@@ -22,6 +22,7 @@
+ 
+ #include "config.h"
+ 
++#include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -29,7 +30,6 @@
+ #include <poll.h>
+ #include <errno.h>
+ 
+-#include <error.h>
+ #include <getopt.h>
+ 
+ #include <sys/types.h>
+@@ -56,6 +56,18 @@
+ 
+ #include "weston-launch.h"
+ 
++const char *program_name;
++
++void error(int status, int errnum, const char *fmt, ...)
++{
++	printf("%s: %s: ", program_name, strerror(errnum));
++	va_list ap;
++	va_start(ap, fmt);
++	vfprintf(stderr, fmt, ap);
++	va_end(ap);
++	if(status != 0) exit(status);
++}
++
+ #define DRM_MAJOR 226
+ 
+ #ifndef KDSKBMUTE
+@@ -681,6 +693,7 @@
+ 		{ 0,         0,                 NULL,  0  }
+ 	};	
+ 
++	program_name = argv[0];
+ 	memset(&wl, 0, sizeof wl);
+ 
+ 	while ((c = getopt_long(argc, argv, "u:t::vh", opts, &i)) != -1) {

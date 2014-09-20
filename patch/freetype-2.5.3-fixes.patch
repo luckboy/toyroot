@@ -1,0 +1,26 @@
+diff -Naur old/freetype-2.5.3/builds/unix/install.mk new/freetype-2.5.3/builds/unix/install.mk
+--- old/freetype-2.5.3/builds/unix/install.mk	2014-01-09 07:24:44.860174845 +0100
++++ new/freetype-2.5.3/builds/unix/install.mk	2014-09-18 00:24:54.933723454 +0200
+@@ -53,14 +53,14 @@
+           $(DESTDIR)$(includedir)/freetype2/config/ftconfig.h
+ 	$(INSTALL_DATA) $(OBJ_DIR)/ftmodule.h                 \
+           $(DESTDIR)$(includedir)/freetype2/config/ftmodule.h
+-	$(INSTALL_SCRIPT) -m 755 $(OBJ_BUILD)/freetype-config \
+-          $(DESTDIR)$(bindir)/freetype-config
+-	$(INSTALL_SCRIPT) -m 644 $(BUILD_DIR)/freetype2.m4 \
+-          $(DESTDIR)$(datadir)/aclocal/freetype2.m4
+-	$(INSTALL_SCRIPT) -m 644 $(OBJ_BUILD)/freetype2.pc \
+-          $(DESTDIR)$(libdir)/pkgconfig/freetype2.pc
+-	$(INSTALL_DATA) $(TOP_DIR)/docs/freetype-config.1 \
+-          $(DESTDIR)$(mandir)/man1/freetype-config.1
++	#$(INSTALL_SCRIPT) -m 755 $(OBJ_BUILD)/freetype-config \
++        #  $(DESTDIR)$(bindir)/freetype-config
++	#$(INSTALL_SCRIPT) -m 644 $(BUILD_DIR)/freetype2.m4 \
++        #  $(DESTDIR)$(datadir)/aclocal/freetype2.m4
++	#$(INSTALL_SCRIPT) -m 644 $(OBJ_BUILD)/freetype2.pc \
++        #  $(DESTDIR)$(libdir)/pkgconfig/freetype2.pc
++	#$(INSTALL_DATA) $(TOP_DIR)/docs/freetype-config.1 \
++        #  $(DESTDIR)$(mandir)/man1/freetype-config.1
+ 
+ 
+ uninstall:

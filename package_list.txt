@@ -1,1 +1,1 @@
-shadow toyroot-utils grep gzip bzip2 xz tar less nano nvi microperl openssl wget links tnftp findutils sed nawk uClibc++ binutils gmp mpfr mpc zlib gcc-4.8 make m4 autoconf automake
+shadow toyroot-utils grep gzip bzip2 xz tar less nano nvi microperl openssl wget links tnftp findutils sed nawk uClibc++ zlib expat libffi wayland mtdev eudev libpng pixman jpeg freetype cairo libxkbcommon xkeyboard-config openpam weston

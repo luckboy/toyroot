@@ -44,6 +44,8 @@ ROOT_FS_KIND=rootfs
 READ_ONLY=false
 NO_BOOT=false
 NO_KERNEL=false
+VIDEO=""
+IS_VIDEO=false
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--name=*)
@@ -91,6 +93,15 @@ while [ $# -gt 0 ]; do
 		--no-kernel)
 			NO_KERNEL=true
 			;;
+		--video)
+			VIDEO=cirrusfb:800x600-16
+			IS_VIDEO=true
+			;;
+		--video=*)
+			VIDEO="`echo "$1" | sed 's/^[^=]*=//'`"
+			IS_VIDEO=true
+			;;
+
 		*)
 			PKGS="$PKGS $1"
 			;;
@@ -142,6 +153,7 @@ if [ $READ_ONLY != true ]; then
 else
 	mkdir -p "$ROOT_FS_DIR/var"
 fi
+mkdir "$ROOT_FS_DIR/xdg"
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
 # Copies the profile directory to the /etc directory.
@@ -155,6 +167,7 @@ mkdir -p "$ROOT_FS_DIR/home/child"
 if [ ! -e "$ROOT_FS_DIR/etc/fstab" ]; then
 	cat "$ROOT_FS_DIR/etc/fstab.head" > "$ROOT_FS_DIR/etc/fstab"
 	ROOT_FS_OPTS=defaults
+	[ $READ_ONLY = true ] && ROOT_FS_OPTS=ro
 	if [ $ROOT_FS_KIND != initrd ]; then
 		cat >> "$ROOT_FS_DIR/etc/fstab" <<EOT
 /dev/root	/		$ROOT_FS_TYPE		$ROOT_FS_OPTS	0	1
@@ -199,6 +212,8 @@ if [ $NO_KERNEL != true ]; then
 	if [ $NO_BOOT != true ]; then
 		case "$ARCH" in
 			i[3-9]86|x86_64)
+				KERNEL_ARG_VIDEO=""
+				[ $IS_VIDEO = true ] && KERNEL_ARG_VIDEO="video=$VIDEO";
 				if [ $IS_ROOT_DEV != true ]; then
 					if [ $ROOT_FS_KIND != iso ]; then
 						ROOT_DEV=/dev/sda1
@@ -206,13 +221,13 @@ if [ $NO_KERNEL != true ]; then
 						ROOT_DEV=/dev/sr0
 					fi
 				fi
-				mkdir -p "$ROOT_FS_DIR/boot/grub" 
+				mkdir -p "$ROOT_FS_DIR/boot/grub"
 				cat > "$ROOT_FS_DIR/boot/grub/menu.lst" <<EOT
 default 0
 timeout 0
 hiddenmenu
 title Toyroot
-	kernel $K_PKG_KERNEL_FILE root=$ROOT_DEV rootfstype=$ROOT_FS_TYPE devtmpfs.mount=1
+	kernel $K_PKG_KERNEL_FILE root=$ROOT_DEV rootfstype=$ROOT_FS_TYPE logo.nologo devtmpfs.mount=1 $KERNEL_ARG_VIDEO
 EOT
 				if [ $ROOT_FS_KIND != iso ]; then
 					for name in stage1 e2fs_stage1_5 stage2; do
@@ -266,7 +281,7 @@ case $ROOT_FS_KIND in
 				MKISOFS_OPTS_ARCH="-b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table"
 				;;
 		esac
-		mkisofs -r $MKISOFS_OPTS_ARCH -o "$ROOT_FS_IMG" "$ROOT_FS_DIR"
+		mkisofs -uid 0 -gid 0 -R $MKISOFS_OPTS_ARCH -o "$ROOT_FS_IMG" "$ROOT_FS_DIR"
 		;;
 	*)
 		genext2fs -N "$FS_INODES" -b "$FS_SIZE" -d "$ROOT_FS_DIR" -D device_table.txt -U "$ROOT_FS_IMG"

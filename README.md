@@ -169,6 +169,8 @@ Options of this script:
         --no-boot                       don't copy the bootloader files to the root file 
                                         system and don't install the bootloader for CDROM.
         --no-kernel                     don't copy the kernel to the root file system.
+        --video=[<mode>]                add a video mode to the kernel arguments (default:
+                                        cirrusfb:800x600-16)
 
 Example:
 
@@ -193,6 +195,8 @@ Options of the script:
         --sectors=<sectors>             specify the sectors of the disk.
         --grub-dev=<decive>             specify the disk device for grub (default: (hd0)).
         --no-boot                       don't install bootloader on the disk image.
+        --video=[<mode>]                add a video mode to the kernel arguments (default:
+                                        cirrusfb:800x600-16)
 
 Example:
 

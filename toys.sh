@@ -47,6 +47,7 @@ fi
 ASM_INCLUDE_DIR="$INCLUDE_DIR/asm"
 ASM_GENERIC_INCLUDE_DIR="$INCLUDE_DIR/asm-generic"
 LINUX_INCLUDE_DIR="$INCLUDE_DIR/linux"
+MTD_INCLUDE_DIR="$INCLUDE_DIR/mtd"
 
 MUSL_GCC="$ROOT_DIR/bin/$ARCH/musl/bin/musl-gcc"
 GXX_UC="$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/bin/g++-uc"
@@ -127,7 +128,7 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/musl" ]; then
 	cd "build/$ARCH/musl/musl-$MUSL_VERSION"
 	[ -f Makefile ] && make clean
 	(CC="$GCC" CFLAGS="$GCC_CFLAGS" LDFLAGS=-s ./configure --prefix="$ROOT_DIR/bin/$ARCH/musl" "$TARGET" && make install) || exit 1
-	ln -sf $ASM_INCLUDE_DIR $ASM_GENERIC_INCLUDE_DIR $LINUX_INCLUDE_DIR "$ROOT_DIR/bin/$ARCH/musl/include"
+	ln -sf "$ASM_INCLUDE_DIR" "$ASM_GENERIC_INCLUDE_DIR" "$LINUX_INCLUDE_DIR" "$MTD_INCLUDE_DIR" "$ROOT_DIR/bin/$ARCH/musl/include"
 	cd ../../../..
 	echo -n > "bin/$ARCH/musl.nonextra"
 fi
