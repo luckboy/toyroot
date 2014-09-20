@@ -1,0 +1,11 @@
+--- old/toybox-0.4.9/toys/posix/id.c	2014-07-07 06:43:29.000000000 +0200
++++ new/toybox-0.4.9/toys/posix/id.c	2014-09-21 00:19:28.035237832 +0200
+@@ -115,6 +115,8 @@
+     : getgroups(i, groups);
+   if (0 >= ngroups) perror_exit(0);
+ 
++  if (!(flags & FLAG_G)) xputc(' ');
++
+   for (i = 0;;) {
+     if (!(grp = getgrgid(groups[i]))) perror_msg(0);
+     else if (flags & FLAG_G) s_or_u(grp->gr_name, grp->gr_gid, 0);
