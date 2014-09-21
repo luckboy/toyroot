@@ -238,20 +238,12 @@ move_dev_files_to_dev_package() {
 			mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/lib"
 			mv "$ROOT_DIR/bin/$ARCH/$1/lib"/lib*.a "$ROOT_DIR/bin/$ARCH/$1""_dev/lib"
 		fi
-		if [ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/lib"/lib*.la | cut -d ' ' -f 1`" ]; then
-			mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/lib"
-			mv "$ROOT_DIR/bin/$ARCH/$1/lib"/lib*.la "$ROOT_DIR/bin/$ARCH/$1""_dev/lib"
-		fi
 		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/lib"
 	fi
 	if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"; then
 		if [ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.a | cut -d ' ' -f 1`" ]; then
 			mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
 			mv "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.a "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
-		fi
-		if [ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.la | cut -d ' ' -f 1`" ]; then
-			mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
-			mv "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.la "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
 		fi
 		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"
 	fi
@@ -270,8 +262,20 @@ move_dev_files_to_dev_package() {
 	remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr"
 }
 
+remove_la_files_from_lib_dirs() {
+	if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/lib"; then
+		[ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/lib"/lib*.la | cut -d ' ' -f 1`" ] && rm -f "$ROOT_DIR/bin/$ARCH/$1/lib"/lib*.la
+	        remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/lib"
+	fi
+	if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"; then
+		[ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.la | cut -d ' ' -f 1`" ] && rm -f "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.la
+		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"
+	fi
+}
+
 create_dev_package_from_package() {
 	move_dev_files_to_dev_package "$1"
+	remove_la_files_from_lib_dirs "$1"
 	compress_man_files "$1"_dev
 }
 

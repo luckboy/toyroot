@@ -4,5 +4,6 @@ STATUS=$?
 if [ $STATUS = 0 ]; then
 	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/awk"
 	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin"/gawk-*
+	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/gawk"/*.la
 fi
 [ $STATUS = 0 ]

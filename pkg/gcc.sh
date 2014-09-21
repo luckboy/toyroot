@@ -103,6 +103,8 @@ if [ $STATUS = 0 ]; then
 	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/c++"
 	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/$MUSL_TARGET-c++"
 	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/$MUSL_TARGET-gcc-$PKG_VERSION"
+	[ -d "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/gcc/$MUSL_TARGET/$PKG_VERSION" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/gcc/$MUSL_TARGET/$PKG_VERSION"/lib*.la
+	[ -d "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/libexec/gcc/$MUSL_TARGET/$PKG_VERSION" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/libexec/gcc/$MUSL_TARGET/$PKG_VERSION"/*.la
 	mv "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/cpp" "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/cpp-$PKG_GCC_VERSION"
 	mv "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/gcov" "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/bin/gcov-$PKG_GCC_VERSION"
 	if [ -d "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/gcc/$MUSL_TARGET/$PKG_VERSION" ]; then

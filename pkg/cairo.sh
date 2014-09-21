@@ -7,6 +7,7 @@ pixman_LIBS="-L$ROOT_DIR/bin/$ARCH/pixman/usr/lib -L$ROOT_DIR/bin/$ARCH/pixman_d
 ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-xlib --disable-xcb --without-x --disable-xlib-xrender --disable-gobject --disable-gtk-doc-html && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"
 STATUS=$?
 if [ $STATUS = 0 ]; then
+	[ -d "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/cairo" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/cairo"/*.la
 	if [ -d "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/gtk-doc" ]; then
 		rm -fr "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/gtk-doc"
 		[ "`ls "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share"`" = "" ] && rmdir "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share"

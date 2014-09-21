@@ -43,5 +43,8 @@ PNG_LIBS="-L$ROOT_DIR/bin/$ARCH/libpng/usr/lib -L$ROOT_DIR/bin/$ARCH/libpng_dev/
 	--enable-demo-clients-install \
 && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"
 STATUS=$?
-[ $STATUS = 0 ] && [ "`ls "$ROOT_DIR/bin/$ARCH/weston/usr/share/man/man7"`" = "" ] && rmdir "$ROOT_DIR/bin/$ARCH/weston/usr/share/man/man7"
+if [ $STATUS = 0 ]; then
+	[ "`ls "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/man/man7"`" = "" ] && rmdir "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/man/man7"
+	rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/weston"/*.la
+fi
 [ $STATUS = 0 ]
