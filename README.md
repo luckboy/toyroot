@@ -195,8 +195,6 @@ Options of the script:
         --sectors=<sectors>             specify the sectors of the disk.
         --grub-dev=<decive>             specify the disk device for grub (default: (hd0)).
         --no-boot                       don't install bootloader on the disk image.
-        --video=[<mode>]                add a video mode to the kernel arguments (default:
-                                        cirrusfb:800x600-16)
 
 Example:
 
@@ -212,10 +210,12 @@ Usage of this script:
 
 Options of this script:
 
-         --name=<name>                  specify the profile name.
-         --disk                         run system from disk image (only for x86_64).
-         --initrd                       run system from initrd file system.
-         --iso                          run system from CDROM image (only for x86_64).
+        --name=<name>                  specify the profile name.
+        --disk                         run system from disk image (only for x86_64).
+        --initrd                       run system from initrd file system.
+        --iso                          run system from CDROM image (only for x86_64).
+        --video=[<mode>]                add a video mode to the kernel arguments (default:
+                                        cirrusfb:800x600-16)
     
 Example:
 
