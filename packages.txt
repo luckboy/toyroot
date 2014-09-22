@@ -51,6 +51,5 @@ freetype	2.5.3		tar.bz2		http://softlayer-ams.dl.sourceforge.net/project/freetyp
 cairo		1.12.16		tar.xz		http://cairographics.org/releases
 libxkbcommon	0.4.3		tar.xz		http://xkbcommon.org/download
 xkeyboard-config 2.11		tar.bz2		http://www.x.org/releases/individual/data/xkeyboard-config
-#Linux-PAM	1.1.8		tar.bz2		http://www.linux-pam.org/library
 openpam		20140912	tar.gz		http://kent.dl.sourceforge.net/project/openpam/openpam/Ourouparia
 weston		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
