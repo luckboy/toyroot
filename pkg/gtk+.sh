@@ -1,17 +1,17 @@
 [ -f Makefile ] && make clean
-CC="$MUSL_GCC" CXX="$GXX_UC" CFLAGS="$PKG_CFLAGS" CXXFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS -lgdk_pixbuf-2.0 -lharfbuzz -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lfontconfig -lfreetype -ltiff -lpixman-1 -ljpeg -lpng -lffi -lexpat -llzma -lbz2 -lz" STRIP="$STRIP" \
-BASE_DEPENDENCIES_CFLAGS="-I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/glib-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/gio-unix-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib/glib-2.0/include -I$ROOT_DIR/bin/$ARCH/atk_dev/usr/include/atk-1.0 -I$ROOT_DIR/bin/$ARCH/pango_dev/usr/include/pango-1.0 -I$ROOT_DIR/bin/$ARCH/cairo_dev/usr/include/cairo -I$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/include/gdk-pixbuf-2.0" \
-BASE_DEPENDENCIES_LIBS="-L$ROOT_DIR/bin/$ARCH/glib/usr/lib -L$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/atk/usr/lib -L$ROOT_DIR/bin/$ARCH/atk_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/pango/usr/lib -L$ROOT_DIR/bin/$ARCH/pango_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/lib -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -latk-1.0 -lpango-1.0 -lpangocairo-1.0 -lpangoft2-1.0 -lcairo -lcairo-gobject -lcairo-script-interpreter -lgdk_pixbuf-2.0" \
-CAIRO_BACKEND_CFLAGS="-I$ROOT_DIR/bin/$ARCH/cairo_dev/usr/include/cairo" \
-CAIRO_BACKEND_LIBS="-L$ROOT_DIR/bin/$ARCH/cairo/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo_dev/usr/lib -lcairo -lcairo-gobject -lcairo-script-interpreter" \
-GDK_DEP_CFLAGS="-I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/glib-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/gio-unix-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib/glib-2.0/include  -I$ROOT_DIR/bin/$ARCH/pango_dev/usr/include/pango-1.0 -I$ROOT_DIR/bin/$ARCH/cairo_dev/usr/include/cairo -I$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/include/gdk-pixbuf-2.0 -I$ROOT_DIR/bin/$ARCH/wayland_dev/usr/include -I$ROOT_DIR/bin/$ARCH/libxkbcommon_dev/usr/include/xkbcommon" \
-GDK_DEP_LIBS="-L$ROOT_DIR/bin/$ARCH/glib/usr/lib -L$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/pango/usr/lib -L$ROOT_DIR/bin/$ARCH/pango_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/wayland_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/wayland/usr/lib -L$ROOT_DIR/bin/$ARCH/libxkbcommon/usr/lib -L$ROOT_DIR/bin/$ARCH/libxkbcommon_dev/usr/lib -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lpango-1.0 -lpangocairo-1.0 -lpangoft2-1.0 -lcairo -lcairo-gobject -lcairo-script-interpreter -lgdk_pixbuf-2.0 -lwayland-client -lwayland-cursor -lxkbcommon" \
-ATK_CFLAGS="-I$ROOT_DIR/bin/$ARCH/atk_dev/usr/include/atk-1.0" \
-ATK_LIBS="-L$ROOT_DIR/bin/$ARCH/atk/usr/lib -L$ROOT_DIR/bin/$ARCH/atk_dev/usr/lib -latk-1.0" \
-GTK_DEP_CFLAGS="-I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/glib-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/gio-unix-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib/glib-2.0/include -I$ROOT_DIR/bin/$ARCH/atk_dev/usr/include/atk-1.0 -I$ROOT_DIR/bin/$ARCH/pango_dev/usr/include/pango-1.0 -I$ROOT_DIR/bin/$ARCH/cairo_dev/usr/include/cairo -I$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/include/gdk-pixbuf-2.0" \
-GTK_DEP_LIBS="-L$ROOT_DIR/bin/$ARCH/glib/usr/lib -L$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/atk/usr/lib -L$ROOT_DIR/bin/$ARCH/atk_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/pango/usr/lib -L$ROOT_DIR/bin/$ARCH/pango_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo/usr/lib -L$ROOT_DIR/bin/$ARCH/cairo_dev/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf/usr/lib -L$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/lib -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -latk-1.0 -lpango-1.0 -lpangocairo-1.0 -lpangoft2-1.0 -lcairo -lcairo-gobject -lcairo-script-interpreter -lgdk_pixbuf-2.0" \
-GMODULE_CFLAGS="-I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/glib-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib/glib-2.0/include" \
-GMODULE_LIBS="-L$ROOT_DIR/bin/$ARCH/glib/usr/lib -L$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0" \
+CC="$MUSL_GCC" CXX="$GXX_UC" CFLAGS="$PKG_CFLAGS" CXXFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS $PKG_GLIB_LIBS $PKG_ATK_LIBS $PKG_PANGO_LIBS $PKG_CAIRO_GOBJECT_LIBS $PKG_GDK_PIXBUF_LIBS $PKG_WAYLAND_LIBS $PKG_LIBXKBCOMMON_LIBS $PKG_DEP_GLIB_LIBS $PKG_DEP_ATK_LIBS $PKG_DEP_PANGO_LIBS $PKG_DEP_CAIRO_GOBJECT_LIBS $PKG_DEP_GDK_PIXBUF_LIBS" STRIP="$STRIP" \
+BASE_DEPENDENCIES_CFLAGS="$PKG_DEP_GLIB_CFLAGS $PKG_DEP_ATK_CFLAGS $PKG_DEP_PANGO_CFLAGS $PKG_DEP_CAIRO_GOBJECT_CFLAGS $PKG_DEP_GDK_PIXBUF_CFLAGS" \
+BASE_DEPENDENCIES_LIBS="$PKG_DEP_GLIB_LIBS $PKG_DEP_ATK_LIBS $PKG_DEP_PANGO_LIBS $PKG_DEP_CAIRO_GOBJECT_LIBS $PKG_DEP_GDK_PIXBUF_LIBS" \
+CAIRO_BACKEND_CFLAGS="$PKG_DEP_CAIRO_GOBJECT_CFLAGS" \
+CAIRO_BACKEND_LIBS="$PKG_DEP_CAIRO_GOBJECT_LIBS" \
+GDK_DEP_CFLAGS="$PKG_DEP_GLIB_CFLAGS $PKG_DEP_PANGO_CFLAGS $PKG_DEP_CAIRO_CFLAGS $PKG_DEP_GDK_PIXBUF_CFLAGS $PKG_DEP_WAYLAND_CFLAGS $PKG_DEP_LIBXKBCOMMON_CFLAGS" \
+GDK_DEP_LIBS="$PKG_DEP_GLIB_LIBS $PKG_DEP_PANGO_LIBS $PKG_DEP_CAIRO_LIBS $PKG_DEP_GDK_PIXBUF_LIBS $PKG_DEP_WAYLAND_CLIENT_LIBS $PKG_DEP_WAYLAND_CURSOR_LIBS $PKG_DEP_LIBXKBCOMMON_LIBS" \
+ATK_CFLAGS="$PKG_DEP_ATK_CFLAGS" \
+ATK_LIBS="$PKG_DEP_ATK_CFLAGS" \
+GTK_DEP_CFLAGS="$PKG_DEP_GLIB_CFLAGS $PKG_DEP_ATK_CFLAGS $PKG_DEP_PANGO_CFLAGS $PKG_DEP_CAIRO_GOBJECT_CFLAGS $PKG_DEP_GDK_PIXBUF_CFLAGS" \
+GTK_DEP_LIBS="$PKG_DEP_GLIB_LIBS $PKG_DEP_ATK_LIBS $PKG_DEP_PANGO_LIBS $PKG_DEP_CAIRO_GOBJECT_LIBS $PKG_DEP_GDK_PIXBUF_LIBS" \
+GMODULE_CFLAGS="$PKG_DEP_GLIB_CFLAGS" \
+GMODULE_LIBS="$PKG_DEP_GLIB_GMODULE_LIBS" \
 WAYLAND_SCANNER="$ROOT_DIR/build/$ARCH/wayland/wayland-host/wayland-scanner" \
 ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-wayland-backend --without-x && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME" GLIB_MKENUMS=glib-mkenums GLIB_GENMARSHAL=glib-genmarshal GLIB_COMPILE_RESOURCES=glib-compile-resources
 STATUS=$?

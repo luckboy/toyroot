@@ -1,5 +1,5 @@
 [ -f Makefile ] && make clean
-CC="$MUSL_GCC" CFLAGS="$PKG_CFLAGS -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/include/glib-2.0 -I$ROOT_DIR/bin/$ARCH/glib_dev/usr/lib/glib-2.0/include -I$ROOT_DIR/bin/$ARCH/atk_dev/usr/include/atk-1.0 -I$ROOT_DIR/bin/$ARCH/pango_dev/usr/include/pango-1.0 -I$ROOT_DIR/bin/$ARCH/cairo_dev/usr/include/cairo -I$ROOT_DIR/bin/$ARCH/gdk-pixbuf_dev/usr/include/gdk-pixbuf-2.0" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS -lgmodule-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -latk-1.0 -lpango-1.0 -lpangocairo-1.0 -lpangoft2-1.0 -lcairo -lcairo-gobject -lcairo-script-interpreter -lgdk_pixbuf-2.0 -lharfbuzz -lfontconfig -lfreetype -ltiff -lpixman-1 -ljpeg -lpng -lffi -lexpat -llzma -lbz2 -lz -lwayland-client -lwayland-cursor -lxkbcommon" STRIP="$STRIP" \
-GTK_CFLAGS="-I$ROOT_DIR/bin/$ARCH/gtk+_dev/usr/include/gtk-3.0" \
-GTK_LIBS="-L$ROOT_DIR/bin$ARCH/gtk+/usr/lib -lgdk-3 -lgtk-3" \
+CC="$MUSL_GCC" CFLAGS="$PKG_CFLAGS $PKG_GTKX_CFLAGS" LDFLAGS="$PKG_LDFLAGS $PKG_GTKX_LDFLAGS" LIBS="$PKG_LIBS $PKG_GTKX_LIBS" STRIP="$STRIP" \
+GTK_CFLAGS="$PKG_DEP_GTKX_CFLAGS" \
+GTK_LIBS="$PKG_DEP_GTKX_LIBS" \
 ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"

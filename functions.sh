@@ -379,12 +379,13 @@ build_extra_package() {
 		create_doc_package_from_package "$PKG_NAME"
 		[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh"
 	fi
+	[ -f "pkg/$PKG_NAME""_vars.sh" ] && . "pkg/$PKG_NAME""_vars.sh"
 	[ -d "bin/$ARCH/$PKG_NAME"_dev ] && DEV_PKGS="$DEV_PKGS $PKG_NAME"
 }
 
 install_extra_package() {
 	local PKG_NAME="$1"
-	[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
+	[ -f "bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
 	mkdir -p "$PKG_ROOT_DIR"
 	[ -d "bin/$ARCH/$PKG_NAME" ] && cp -drp "bin/$ARCH/$PKG_NAME"/* "$PKG_ROOT_DIR"
 	if [ "$PKG_SUFFIXES" != "" ]; then
@@ -396,7 +397,7 @@ install_extra_package() {
 
 configure_extra_package() {
 	local PKG_NAME="$1"
-	[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
+	[ -f "bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
 	[ -d "pkg/$PKG_NAME""_etc" ] && cp -drpT "pkg/$PKG_NAME""_etc" "$PKG_ROOT_DIR/etc"
 	[ -f "pkg/$PKG_NAME""_etc.sh" ] && . "pkg/$PKG_NAME""_etc.sh"
 }

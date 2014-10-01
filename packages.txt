@@ -55,12 +55,12 @@ cairo		1.12.16		tar.xz		http://cairographics.org/releases
 libxkbcommon	0.4.3		tar.xz		http://xkbcommon.org/download
 xkeyboard-config 2.11		tar.bz2		http://www.x.org/releases/individual/data/xkeyboard-config
 openpam		20140912	tar.gz		http://kent.dl.sourceforge.net/project/openpam/openpam/Ourouparia
+harfbuzz	0.9.35		tar.bz2		http://www.freedesktop.org/software/harfbuzz/release
+pango		1.36.8		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/pango/1.36
 weston		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
 atk		2.12.0		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/atk/2.12
 tiff		4.0.3		tar.gz		ftp://ftp.remotesensing.org/pub/libtiff
 gdk-pixbuf	2.30.8		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/2.30
-harfbuzz	0.9.35		tar.bz2		http://www.freedesktop.org/software/harfbuzz/release
-pango		1.36.8		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/pango/1.36
 dejavu-fonts-ttf 2.34		tar.bz2		http://heanet.dl.sourceforge.net/project/dejavu/dejavu/2.34
 gtk+		3.14.0		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gtk+/3.14
 libxml2		2.9.1		tar.gz		ftp://xmlsoft.org/libxml2
