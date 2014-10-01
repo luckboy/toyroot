@@ -285,7 +285,13 @@ move_doc_files_to_doc_package() {
 		mv "$ROOT_DIR/bin/$ARCH/$1/usr/share/doc"/* "$ROOT_DIR/bin/$ARCH/$1""_doc/usr/share/doc"
 		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/doc"
 	fi
+	if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/gtk-doc"; then
+		mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_doc/usr/share/gtk-doc"
+		mv "$ROOT_DIR/bin/$ARCH/$1/usr/share/gtk-doc"/* "$ROOT_DIR/bin/$ARCH/$1""_doc/usr/share/gtk-doc"
+		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/gtk-doc"
+	fi
 	remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/doc"
+	remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/gtk-doc"
 	remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share"
 	remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr"
 }
@@ -331,17 +337,24 @@ build_extra_package() {
 	local PKG_DOWNLOAD_URL="$4"
 	local PKG_SRC_FORMAT="$5"
 	local PKG_BUILD_DIR_FORMAT="$6"
+	local PKG_URL_SRC_FORMAT="$7"
 	[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
 	[ "$PKG_VERSION" = "" ] && return 0
 	[ "$PKG_SRC_FORMAT" = "" ] && PKG_SRC_FORMAT="%p-%v.%e"
 	[ "$PKG_BUILD_DIR_FORMAT" = "" ] && PKG_BUILD_DIR_FORMAT="%p-%v"
+	[ "$PKG_URL_SRC_FORMAT" = "" ] && PKG_URL_SRC_FORMAT=""
 	set_extra_package_cflags
 	set_extra_package_ldflags
 	set_extra_package_libs
 	if [ ! -d "bin/$ARCH/$PKG_NAME" ]; then
 		local PKG_SRC="`echo "$PKG_SRC_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/" -e "s/%e/$PKG_SRC_EXT/"`"
 		local PKG_BUILD_DIR="`echo "$PKG_BUILD_DIR_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/"`"
-		download_source "$PKG_SRC" "$PKG_DOWNLOAD_URL"
+		local PKG_URL_SRC="`echo "$PKG_URL_SRC_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/" -e "s/%e/$PKG_SRC_EXT/"`"
+		if [ "$PKG_URL_SRC" = "" ]; then
+			download_source "$PKG_SRC" "$PKG_DOWNLOAD_URL"
+		else
+			download_source "$PKG_SRC" "$PKG_DOWNLOAD_URL" "$PKG_URL_SRC"
+		fi
 		[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postdonwload.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postdonwload.sh"
 		if extract_package "$PKG_NAME" "$PKG_SRC" "$PKG_BUILD_DIR"; then
 			[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postextract.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postextract.sh"
@@ -379,6 +392,13 @@ install_extra_package() {
 			[ -d "bin/$ARCH/$PKG_NAME""_$sfx" ] && cp -drp "bin/$ARCH/$PKG_NAME""_$sfx"/* "$PKG_ROOT_DIR"
 		done
 	fi
+}
+
+configure_extra_package() {
+	local PKG_NAME="$1"
+	[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
+	[ -d "pkg/$PKG_NAME""_etc" ] && cp -drpT "pkg/$PKG_NAME""_etc" "$PKG_ROOT_DIR/etc"
+	[ -f "pkg/$PKG_NAME""_etc.sh" ] && . "pkg/$PKG_NAME""_etc.sh"
 }
 
 process_extra_packages() {

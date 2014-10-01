@@ -255,6 +255,7 @@ fi
 
 PKG_ROOT_DIR="$ROOT_FS_DIR"
 process_extra_packages install_extra_package
+process_extra_packages configure_extra_package
 select_programs
 install_all_infos
 

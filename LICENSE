@@ -73,9 +73,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 The patches of the packages under GPLv2:
-patch/sysvinit-*.patch
-patch/man-*.patch
 patch/grub-0.*.patch
+patch/man-*.patch
+patch/sysvinit-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 
@@ -115,7 +115,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 The patches of the packages under LGPLv2.1:
+patch/gdk-pixbuf-*.patch
+patch/gtk+-*.patch
 patch/uClibc++-*.patch
+patch/pango-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "Starting gdk-pixbuf ..."
+		if [ "$READ_ONLY" = true ]; then
+			mkdir -p /var/lib/gdk-pixbuf-2.0/2.10.0
+			echo -n > /var/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+		fi
+		[ "$READ_ONLY" = true -o ! -f /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache ] && gdk-pixbuf-query-loaders > /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+		;;
+	stop)
+		echo "Stopping gdk-pixbuf ..."
+		;;
+esac

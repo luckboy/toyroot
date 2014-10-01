@@ -24,7 +24,9 @@ if [ -e /dev/fb0 ]; then
 fi
 if [ "`readlink /etc/mtab`" = /proc/mounts ]; then
 	mkdir -p /var/etc /var/db /var/run /var/tmp
-	echo -n > /var/etc/resolv.conf
+	READ_ONLY=true
+else
+	READ_ONLY=false
 fi
 
 echo "Setting hostname ..."

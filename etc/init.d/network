@@ -5,6 +5,7 @@
 case "$1" in
 	start)
 		echo "Starting network ..."
+		[ "$READ_ONLY" = true ] && echo -n > /var/etc/resolv.conf
 		ifconfig lo 127.0.0.0 netmask 255.0.0.0 up
 		if [ "$INTERFACE" != "" ]; then
 			if [ "$ADDRESS" != "" -a "$DHCP" != yes -a "$DHCP" != true ]; then

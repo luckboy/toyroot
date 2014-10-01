@@ -1,0 +1,19 @@
+diff -Naur old/libxml2-2.9.1/threads.c new/libxml2-2.9.1/threads.c
+--- old/libxml2-2.9.1/threads.c	2013-04-05 17:08:04.000000000 +0200
++++ new/libxml2-2.9.1/threads.c	2014-09-29 22:31:47.970795863 +0200
+@@ -47,6 +47,7 @@
+ #ifdef HAVE_PTHREAD_H
+ 
+ static int libxml_is_threaded = -1;
++#if 0
+ #ifdef __GNUC__
+ #ifdef linux
+ #if (__GNUC__ == 3 && __GNUC_MINOR__ >= 3) || (__GNUC__ > 3)
+@@ -91,6 +92,7 @@
+ #endif /* linux */
+ #endif /* __GNUC__ */
+ #endif /* HAVE_PTHREAD_H */
++#endif
+ 
+ /*
+  * TODO: this module still uses malloc/free and not xmlMalloc/xmlFree

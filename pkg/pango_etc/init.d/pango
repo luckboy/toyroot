@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "Starting pango ..."
+		if [ "$READ_ONLY" = true ]; then
+			mkdir -p /var/etc/pango
+			echo -n > /var/etc/pango/pango.modules
+		fi
+		[ "$READ_ONLY" = true -o ! -f /etc/pango/pango.modules ] && pango-querymodules > /etc/pango/pango.modules
+		;;
+	stop)
+		echo "Stopping pango ..."
+		;;
+esac
