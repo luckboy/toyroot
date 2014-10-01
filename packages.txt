@@ -63,10 +63,6 @@ harfbuzz	0.9.35		tar.bz2		http://www.freedesktop.org/software/harfbuzz/release
 pango		1.36.8		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/pango/1.36
 dejavu-fonts-ttf 2.34		tar.bz2		http://heanet.dl.sourceforge.net/project/dejavu/dejavu/2.34
 gtk+		3.14.0		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gtk+/3.14
-#zukitwo-gtk-theme d3df2ot		zip	http://fc05.deviantart.net/fs70/f/2014/143/b/d			zukitwo_by_lassekongo83-%v.%e Zukitwo
-#evolve-gtk-theme d4dn66o	zip		http://fc04.deviantart.net/fs71/f/2013/302/4/7			evolve___gtk3_theme_by_satya164-%v.%e Evolve
-#albatross-gtk-theme 1.7.3	zip		https://codeload.github.com/shimmerproject/Albatross/zip	Albatross-%v.%e	Albatross-%v	v%v
-#orion-gtk-theme	d4nk24s		zip		http://fc03.deviantart.net/fs71/f/2013/260/d/f			orion___gtk3_theme_by_satya164-%v.%e Orion
 libxml2		2.9.1		tar.gz		ftp://xmlsoft.org/libxml2
 libcroco	0.6.8		tar.xz		http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6
 librsvg		2.40.4		tar.xz		https://download.gnome.org/sources/librsvg/2.40
@@ -76,7 +72,3 @@ gnome-icon-theme-symbolic 3.12.0 tar.xz		https://download.gnome.org/sources/gnom
 adwaita-icon-theme 3.14.0	tar.xz		https://download.gnome.org/sources/adwaita-icon-theme/3.14
 hicolor-icon-theme 0.13		tar.gz		http://icon-theme.freedesktop.org/releases
 l3afpad		0.8.18.1.10	tar.xz		http://www.calno.com/l3afpad
-libidn		1.29		tar.gz		http://ftp.gnu.org/gnu/libidn
-rtmpdump	2.3		tgz		http://rtmpdump.mplayerhq.hu/download
-curl		7.38.0		tar.bz2		http://curl.haxx.se/download
-netsurf-all	3.2		tar.gz		http://download.netsurf-browser.org/netsurf/releases/source-full
