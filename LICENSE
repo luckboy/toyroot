@@ -117,8 +117,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 The patches of the packages under LGPLv2.1:
 patch/gdk-pixbuf-*.patch
 patch/gtk+-*.patch
-patch/uClibc++-*.patch
 patch/pango-*.patch
+patch/uClibc++-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 
