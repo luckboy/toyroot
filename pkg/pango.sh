@@ -12,5 +12,5 @@ GLIB_CFLAGS="$PKG_DEP_GLIB_CFLAGS" \
 GLIB_LIBS="$PKG_DEP_GLIB_LIBS" \
 ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-symbol-lookup --without-xft && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"
 STATUS=$?
-[ $STATUS = 0 ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/pango-1.8.0/modules"/*.la
+[ $STATUS = 0 ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/pango/1.8.0/modules"/*.la
 [ $STATUS = 0 ]
