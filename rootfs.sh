@@ -153,7 +153,6 @@ if [ $READ_ONLY != true ]; then
 else
 	mkdir -p "$ROOT_FS_DIR/var"
 fi
-mkdir "$ROOT_FS_DIR/xdg"
 mkdir -p "$ROOT_FS_DIR/root"
 mkdir -p "$ROOT_FS_DIR/home/child"
 # Copies the profile directory to the /etc directory.

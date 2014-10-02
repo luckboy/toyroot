@@ -1,4 +1,4 @@
-# <name>	<version>	<extension>	<download url>							<src format>	<build dir format>	<named src format>
+# <name>	<version>	<extension>	<download url>							<src format>	<build dir format>	<url src format>
 iputils
 dhcp
 util-linux

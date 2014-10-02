@@ -240,12 +240,24 @@ move_dev_files_to_dev_package() {
 		fi
 		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/lib"
 	fi
+	if [ -e "$ROOT_DIR/bin/$ARCH/$1/lib/pkgconfig" ]; then
+		mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/lib"
+		mv "$ROOT_DIR/bin/$ARCH/$1/lib/pkgconfig" "$ROOT_DIR/bin/$ARCH/$1""_dev/lib/pkgconfig"
+	fi
 	if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"; then
 		if [ -e "`echo "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.a | cut -d ' ' -f 1`" ]; then
 			mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
 			mv "$ROOT_DIR/bin/$ARCH/$1/usr/lib"/lib*.a "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
 		fi
 		remove_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/lib"
+	fi
+	if [ -e "$ROOT_DIR/bin/$ARCH/$1/usr/lib/pkgconfig" ]; then
+		mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib"
+		mv "$ROOT_DIR/bin/$ARCH/$1/usr/lib/pkgconfig" "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/lib/pkgconfig"
+	fi
+	if [ -e "$ROOT_DIR/bin/$ARCH/$1/usr/share/pkgconfig" ]; then
+		mkdir -p "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/share"
+		mv "$ROOT_DIR/bin/$ARCH/$1/usr/share/pkgconfig" "$ROOT_DIR/bin/$ARCH/$1""_dev/usr/share/pkgconfig"
 	fi
 	for s in 2 3; do
 		if is_non_empty_directory "$ROOT_DIR/bin/$ARCH/$1/usr/share/man/man$s"; then
@@ -398,7 +410,7 @@ install_extra_package() {
 configure_extra_package() {
 	local PKG_NAME="$1"
 	[ -f "bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
-	[ -d "pkg/$PKG_NAME""_etc" ] && cp -drpT "pkg/$PKG_NAME""_etc" "$PKG_ROOT_DIR/etc"
+	[ -d "pkg/$PKG_NAME""_etc" ] && cp -drpTn "pkg/$PKG_NAME""_etc" "$PKG_ROOT_DIR/etc"
 	[ -f "pkg/$PKG_NAME""_etc.sh" ] && . "pkg/$PKG_NAME""_etc.sh"
 }
 

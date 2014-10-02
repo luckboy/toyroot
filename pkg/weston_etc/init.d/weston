@@ -1,0 +1,14 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "Starting weston ..."
+		if [ -e /dev/fb0 ]; then
+			chown root:weston-launch /dev/fb0
+			chmod 660 /dev/fb0
+		fi
+		;;
+	stop)
+		echo "Stopping weston ..."
+		;;
+esac

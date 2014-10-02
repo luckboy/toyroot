@@ -18,15 +18,11 @@ mount -f /proc
 mount -a
 
 echo "Preparing filesystems ..."
-if [ -e /dev/fb0 ]; then
-	chown root:weston-launch /dev/fb0
-	chmod 660 /dev/fb0
-fi
 if [ "`readlink /etc/mtab`" = /proc/mounts ]; then
 	mkdir -p /var/etc /var/db /var/run /var/tmp
-	READ_ONLY=true
+	export READ_ONLY=true
 else
-	READ_ONLY=false
+	export READ_ONLY=false
 fi
 
 echo "Setting hostname ..."
