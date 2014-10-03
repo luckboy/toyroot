@@ -1,5 +1,5 @@
 PKG_EUDEV_CFLAGS=""
 PKG_EUDEV_LDFLAGS=""
 PKG_EUDEV_LIBS=""
-PKG_DEP_EUDEV_CFLAGS="-I$ROOT_DIR/bin/$ARCH/eudev_dev/usr/include"
-PKG_DEP_EUDEV_LIBS="-ludev"
+PKGCFG_EUDEV_CFLAGS="-I$ROOT_DIR/bin/$ARCH/eudev_dev/usr/include"
+PKGCFG_EUDEV_LIBS="-ludev"

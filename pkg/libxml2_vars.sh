@@ -1,5 +1,5 @@
 PKG_LIBXML2_CFLAGS=""
 PKG_LIBXML2_LDFLAGS=""
 PKG_LIBXML2_LIBS="-llzma -lz"
-PKG_DEP_LIBXML2_CFLAGS="-I$ROOT_DIR/bin/$ARCH/libxml2_dev/usr/include/libxml2"
-PKG_DEP_LIBXML2_LIBS="-lxml2"
+PKGCFG_LIBXML2_CFLAGS="-I$ROOT_DIR/bin/$ARCH/libxml2_dev/usr/include/libxml2"
+PKGCFG_LIBXML2_LIBS="-lxml2"
