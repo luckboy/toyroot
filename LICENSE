@@ -97,8 +97,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 The patches of the packages under GPLv3:
 patch/binutils-*.patch
-patch/gzip-*.patch
 patch/findutils-*.patch
+patch/gzip-*.patch
+patch/mc-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.
 

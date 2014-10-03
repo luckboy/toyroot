@@ -1,0 +1,11 @@
+diff -Naur old/mc-4.8.13/lib/tty/tty-ncurses.c new/mc-4.8.13/lib/tty/tty-ncurses.c
+--- old/mc-4.8.13/lib/tty/tty-ncurses.c	2014-09-02 11:23:58.000000000 +0200
++++ new/mc-4.8.13/lib/tty/tty-ncurses.c	2014-10-03 19:07:51.857235225 +0200
+@@ -37,6 +37,7 @@
+ #ifdef HAVE_SYS_IOCTL_H
+ #include <sys/ioctl.h>
+ #endif
++#include <sys/ttydefaults.h>
+ #include <termios.h>
+ 
+ #include "lib/global.h"
