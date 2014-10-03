@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. /etc/network.conf
+
+case "$1" in
+	start)
+		echo "Starting firewall ..."
+		iptables --flush
+		iptables --delete-chain
+		iptables -P INPUT DROP
+		iptables -P FORWARD DROP
+		iptables -P OUTPUT ACCEPT
+		iptables -A INPUT -i lo -j ACCEPT
+		iptables -A INPUT -m state --state INVALID -j DROP
+		iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+		[ "$DHCP" = yes -o "$DHCP" = true ] && iptables -A INPUT -p udp --sport 67 --dport 68 -j ACCEPT
+		[ -e /etc/firewall.conf ] && . /etc/firewall.conf
+		;;
+	stop)
+		echo "Stopping firewall ..."
+		iptables -P INPUT ACCEPT
+		iptables -P FORWARD ACCEPT
+		iptables -P OUTPUT ACCEPT
+		iptables --flush
+		iptables --delete-chain
+		;;
+esac

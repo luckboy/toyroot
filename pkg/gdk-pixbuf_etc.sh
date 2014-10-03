@@ -1,5 +1,5 @@
 mkdir -p "$PKG_ROOT_DIR/etc/rc.d"
 chmod 755 "$PKG_ROOT_DIR/etc/init.d/gdk-pixbuf"
-ln -s ../init.d/gdk-pixbuf "$PKG_ROOT_DIR/etc/rc.d/S20gdk-pixbuf"
-ln -s ../init.d/gdk-pixbuf "$PKG_ROOT_DIR/etc/rc.d/K20gdk-pixbuf"
+ln -s ../init.d/gdk-pixbuf "$PKG_ROOT_DIR/etc/rc.d/S30gdk-pixbuf"
+ln -s ../init.d/gdk-pixbuf "$PKG_ROOT_DIR/etc/rc.d/K30gdk-pixbuf"
 [ $READ_ONLY = true ] && ln -sf /var/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache "$PKG_ROOT_DIR/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"

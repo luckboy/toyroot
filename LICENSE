@@ -74,6 +74,7 @@ THE SOFTWARE.
 
 The patches of the packages under GPLv2:
 patch/grub-0.*.patch
+patch/iptables-*.patch
 patch/man-*.patch
 patch/sysvinit-*.patch
 

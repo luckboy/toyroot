@@ -1,0 +1,68 @@
+diff -Naur old/iptables-1.4.21/extensions/libxt_TCPOPTSTRIP.c new/iptables-1.4.21/extensions/libxt_TCPOPTSTRIP.c
+--- old/iptables-1.4.21/extensions/libxt_TCPOPTSTRIP.c	2013-11-22 12:18:13.000000000 +0100
++++ new/iptables-1.4.21/extensions/libxt_TCPOPTSTRIP.c	2014-10-03 10:33:54.026153346 +0200
+@@ -13,6 +13,26 @@
+ #	define TCPOPT_MD5SIG 19
+ #endif
+ 
++#ifndef TCPOPT_WINDOW
++#define TCPOPT_WINDOW		3
++#endif
++
++#ifndef TCPOPT_MAXSEG
++#define TCPOPT_MAXSEG		2
++#endif
++
++#ifndef TCPOPT_SACK_PERMITTED
++#define TCPOPT_SACK_PERMITTED	4
++#endif
++
++#ifndef TCPOPT_SACK
++#define TCPOPT_SACK		5
++#endif
++
++#ifndef TCPOPT_TIMESTAMP
++#define TCPOPT_TIMESTAMP	8
++#endif
++
+ enum {
+ 	O_STRIP_OPTION = 0,
+ };
+diff -Naur old/iptables-1.4.21/include/libiptc/ipt_kernel_headers.h new/iptables-1.4.21/include/libiptc/ipt_kernel_headers.h
+--- old/iptables-1.4.21/include/libiptc/ipt_kernel_headers.h	2013-11-22 12:18:13.000000000 +0100
++++ new/iptables-1.4.21/include/libiptc/ipt_kernel_headers.h	2014-10-03 10:45:18.306143187 +0200
+@@ -5,7 +5,6 @@
+ 
+ #include <limits.h>
+ 
+-#if defined(__GLIBC__) && __GLIBC__ == 2
+ #include <netinet/ip.h>
+ #include <netinet/in.h>
+ #include <netinet/ip_icmp.h>
+@@ -13,15 +12,4 @@
+ #include <netinet/udp.h>
+ #include <net/if.h>
+ #include <sys/types.h>
+-#else /* libc5 */
+-#include <sys/socket.h>
+-#include <linux/ip.h>
+-#include <linux/in.h>
+-#include <linux/if.h>
+-#include <linux/icmp.h>
+-#include <linux/tcp.h>
+-#include <linux/udp.h>
+-#include <linux/types.h>
+-#include <linux/in6.h>
+-#endif
+ #endif
+diff -Naur old/iptables-1.4.21/iptables/xshared.h new/iptables-1.4.21/iptables/xshared.h
+--- old/iptables-1.4.21/iptables/xshared.h	2013-11-22 12:18:13.000000000 +0100
++++ new/iptables-1.4.21/iptables/xshared.h	2014-10-03 10:37:59.266149705 +0200
+@@ -1,6 +1,7 @@
+ #ifndef IPTABLES_XSHARED_H
+ #define IPTABLES_XSHARED_H 1
+ 
++#include <sys/types.h>
+ #include <limits.h>
+ #include <stdbool.h>
+ #include <stdint.h>

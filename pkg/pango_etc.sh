@@ -1,5 +1,5 @@
 mkdir -p "$PKG_ROOT_DIR/etc/rc.d"
 chmod 755 "$PKG_ROOT_DIR/etc/init.d/pango"
-ln -s ../init.d/pango "$PKG_ROOT_DIR/etc/rc.d/S25pango"
-ln -s ../init.d/pango "$PKG_ROOT_DIR/etc/rc.d/K25pango"
+ln -s ../init.d/pango "$PKG_ROOT_DIR/etc/rc.d/S35pango"
+ln -s ../init.d/pango "$PKG_ROOT_DIR/etc/rc.d/K35pango"
 [ $READ_ONLY = true ] && ln -sf /var/etc/pango/pango.modules "$PKG_ROOT_DIR/etc/pango/pango.modules"

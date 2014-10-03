@@ -1,7 +1,7 @@
 mkdir -p "$PKG_ROOT_DIR/etc/rc.d"
 chmod 755 "$PKG_ROOT_DIR/etc/init.d/weston"
-ln -s ../init.d/weston "$PKG_ROOT_DIR/etc/rc.d/S30weston"
-ln -s ../init.d/weston "$PKG_ROOT_DIR/etc/rc.d/K30weston"
+ln -s ../init.d/weston "$PKG_ROOT_DIR/etc/rc.d/S40weston"
+ln -s ../init.d/weston "$PKG_ROOT_DIR/etc/rc.d/K40weston"
 mkdir -p "$PKG_ROOT_DIR/xdg"
 if rgrep -q '^[ \t]*[^ \t]\+[ \t]\+/xdg' "$PKG_ROOT_DIR/etc/fstab"; then
 	echo -n
