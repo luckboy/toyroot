@@ -9,9 +9,9 @@ grub
 grep		2.20		tar.xz		http://ftp.gnu.org/gnu/grep
 gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
 bzip2		1.0.6		tar.gz		http://www.bzip.org/1.0.6
-xz		5.0.5		tar.xz		http://tukaani.org/xz
+xz		5.0.7		tar.xz		http://tukaani.org/xz
 tar		1.28		tar.xz		http://ftp.gnu.org/gnu/tar
-less		458		tar.gz		http://www.greenwoodsoftware.com/less
+less		468		tar.gz		http://www.greenwoodsoftware.com/less
 nano		2.3.6		tar.gz		http://www.nano-editor.org/dist/v2.3
 nvi		1.79		tar.gz		https://sites.google.com/a/bostic.com/keithbostic/files
 microperl	5.14.4		tar.gz		http://www.cpan.org/src/5.0					perl-%v.%e	perl-%v
@@ -22,9 +22,9 @@ tnftp		20130505	tar.gz		ftp://ftp.netbsd.org/pub/NetBSD/misc/lukemftp
 uClibc++
 groff		1.21		tar.gz		http://ftp.gnu.org/gnu/groff
 findutils	4.4.2		tar.gz		http://ftp.gnu.org/pub/gnu/findutils
-sed		4.2		tar.gz		http://ftp.gnu.org/gnu/sed
+sed		4.2.2		tar.gz		http://ftp.gnu.org/gnu/sed
 nawk 		-		tar.gz		http://www.cs.princeton.edu/~bwk/btl.mirror			awk.%e		dummy
-mawk		1.3.4-20131226	tgz		ftp://invisible-island.net/mawk
+mawk		1.3.4-20140914	tgz		ftp://invisible-island.net/mawk
 gawk		4.1.1		tar.xz		http://ftp.gnu.org/gnu/gawk
 man 		1.6g		tar.gz		http://fossies.org/linux/misc
 texinfo		5.2		tar.xz		http://ftp.gnu.org/gnu/texinfo
@@ -46,7 +46,7 @@ autoconf	2.69		tar.xz		http://ftp.gnu.org/gnu/autoconf
 automake	1.14.1		tar.xz		http://ftp.gnu.org/gnu/automake
 strace		4.9		tar.xz		http://netcologne.dl.sourceforge.net/project/strace/strace/4.9
 expat		2.1.0		tar.gz		http://cznic.dl.sourceforge.net/project/expat/expat/2.1.0
-wayland		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
+wayland		1.6.0		tar.xz		http://wayland.freedesktop.org/releases
 mtdev		1.1.5		tar.bz2		http://bitmath.org/code/mtdev
 eudev		1.9		tar.gz		http://dev.gentoo.org/~blueness/eudev
 libpng		1.6.13		tar.xz		http://skylink.dl.sourceforge.net/project/libpng/libpng16/1.6.13
@@ -56,16 +56,16 @@ freetype	2.5.3		tar.bz2		http://softlayer-ams.dl.sourceforge.net/project/freetyp
 fontconfig	2.11.1		tar.bz2		http://www.freedesktop.org/software/fontconfig/release
 cairo		1.12.16		tar.xz		http://cairographics.org/releases
 libxkbcommon	0.4.3		tar.xz		http://xkbcommon.org/download
-xkeyboard-config 2.11		tar.bz2		http://www.x.org/releases/individual/data/xkeyboard-config
+xkeyboard-config 2.13		tar.bz2		http://www.x.org/releases/individual/data/xkeyboard-config
 openpam		20140912	tar.gz		http://kent.dl.sourceforge.net/project/openpam/openpam/Ourouparia
 harfbuzz	0.9.35		tar.bz2		http://www.freedesktop.org/software/harfbuzz/release
 pango		1.36.8		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/pango/1.36
 weston		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
-atk		2.12.0		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/atk/2.12
+atk		2.14.0		tar.xz		http://ftp.gnome.org/pub/GNOME/sources/atk/2.14
 tiff		4.0.3		tar.gz		ftp://ftp.remotesensing.org/pub/libtiff
 gdk-pixbuf	2.30.8		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/2.30
 dejavu-fonts-ttf 2.34		tar.bz2		http://heanet.dl.sourceforge.net/project/dejavu/dejavu/2.34
-gtk+		3.14.0		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gtk+/3.14
+gtk+		3.14.1		tar.xz		http://ftp.gnome.org/pub/gnome/sources/gtk+/3.14
 libxml2		2.9.1		tar.gz		ftp://xmlsoft.org/libxml2
 libcroco	0.6.8		tar.xz		http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6
 librsvg		2.40.4		tar.xz		https://download.gnome.org/sources/librsvg/2.40

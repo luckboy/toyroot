@@ -1,0 +1,12 @@
+diff -Naur old/dhcp-4.1-ESV-R10/common/lpf.c new/dhcp-4.1-ESV-R10/common/lpf.c
+--- old/dhcp-4.1-ESV-R10/common/lpf.c	2014-08-07 01:14:00.000000000 +0200
++++ new/dhcp-4.1-ESV-R10/common/lpf.c	2014-10-04 21:22:33.979235098 +0200
+@@ -37,7 +37,7 @@
+ #include <linux/filter.h>
+ #include <linux/if_ether.h>
+ #include <netinet/in_systm.h>
+-#include <net/if_packet.h>
++#include <linux/if_packet.h>
+ #include "includes/netinet/ip.h"
+ #include "includes/netinet/udp.h"
+ #include "includes/netinet/if_ether.h"
