@@ -17,4 +17,9 @@ if [ ! -e "$PKG_ROOT_DIR/etc/xdg/weston/weston.ini" ]; then
 icon=/usr/share/icons/hicolor/24x24/apps/l3afpad.png
 path=/usr/bin/l3afpad
 EOT
+	[ -x "$PKG_ROOT_DIR/usr/bin/netsurf" ] && cat >> "$PKG_ROOT_DIR/etc/xdg/weston/weston.ini" <<EOT
+[launcher]
+icon=/usr/share/icons/hicolor/24x24/apps/netsurf.png
+path=/usr/bin/netsurf
+EOT
 fi
