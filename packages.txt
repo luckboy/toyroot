@@ -44,6 +44,7 @@ make		4.0		tar.bz2		http://ftp.gnu.org/gnu/make
 m4		1.4.17		tar.xz		http://ftp.gnu.org/gnu/m4
 autoconf	2.69		tar.xz		http://ftp.gnu.org/gnu/autoconf
 automake	1.14.1		tar.xz		http://ftp.gnu.org/gnu/automake
+strace		4.9		tar.xz		http://netcologne.dl.sourceforge.net/project/strace/strace/4.9
 expat		2.1.0		tar.gz		http://cznic.dl.sourceforge.net/project/expat/expat/2.1.0
 wayland		1.5.93		tar.xz		http://wayland.freedesktop.org/releases
 mtdev		1.1.5		tar.bz2		http://bitmath.org/code/mtdev

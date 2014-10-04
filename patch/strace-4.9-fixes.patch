@@ -1,0 +1,12 @@
+diff -Naur old/strace-4.9/signal.c new/strace-4.9/signal.c
+--- old/strace-4.9/signal.c	2014-08-15 01:29:09.000000000 +0200
++++ new/strace-4.9/signal.c	2014-10-04 14:41:29.396148732 +0200
+@@ -447,7 +447,7 @@
+ 				printsigsource(sip);
+ 				break;
+ #endif
+-#ifdef SI_TIMER
++#if 0
+ 			case SI_TIMER:
+ 				tprintf(", si_timerid=%#x, si_overrun=%d",
+ 					sip->si_timerid, sip->si_overrun);
