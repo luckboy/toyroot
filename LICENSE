@@ -76,6 +76,7 @@ The patches of the packages under GPLv2:
 patch/grub-0.*.patch
 patch/iptables-*.patch
 patch/man-*.patch
+patch/netsurf-all-*-fixed-netsurf.patch
 patch/sysvinit-*.patch
 
 Copyright (C) 2014 Łukasz Szpakowski.

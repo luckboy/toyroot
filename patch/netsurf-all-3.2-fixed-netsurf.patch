@@ -1,0 +1,46 @@
+diff -Naur old/netsurf-all-3.2/netsurf/utils/base64.c new/netsurf-all-3.2/netsurf/utils/base64.c
+--- old/netsurf-all-3.2/netsurf/utils/base64.c	2014-08-29 23:34:41.000000000 +0200
++++ new/netsurf-all-3.2/netsurf/utils/base64.c	2014-10-03 23:14:50.881015238 +0200
+@@ -64,8 +64,8 @@
+    possible.  If OUTLEN is larger than BASE64_LENGTH(INLEN), also zero
+    terminate the output buffer. */
+ void
+-base64_encode (const char *restrict in, size_t inlen,
+-	       char *restrict out, size_t outlen)
++base64_encode (const char *in, size_t inlen,
++	       char *out, size_t outlen)
+ {
+   static const char b64str[64] =
+     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+@@ -310,8 +310,8 @@
+    that, when applicable, you must remove any line terminators that is
+    part of the data stream before calling this function.  */
+ bool
+-base64_decode (const char *restrict in, size_t inlen,
+-	       char *restrict out, size_t *outlen)
++base64_decode (const char *in, size_t inlen,
++	       char *out, size_t *outlen)
+ {
+   size_t outleft = *outlen;
+ 
+diff -Naur old/netsurf-all-3.2/netsurf/utils/base64.h new/netsurf-all-3.2/netsurf/utils/base64.h
+--- old/netsurf-all-3.2/netsurf/utils/base64.h	2014-08-29 23:34:41.000000000 +0200
++++ new/netsurf-all-3.2/netsurf/utils/base64.h	2014-10-03 23:11:19.413018377 +0200
+@@ -31,13 +31,13 @@
+ 
+ extern bool isbase64 (char ch);
+ 
+-extern void base64_encode (const char *restrict in, size_t inlen,
+-			   char *restrict out, size_t outlen);
++extern void base64_encode (const char *in, size_t inlen,
++			   char *out, size_t outlen);
+ 
+ extern size_t base64_encode_alloc (const char *in, size_t inlen, char **out);
+ 
+-extern bool base64_decode (const char *restrict in, size_t inlen,
+-			   char *restrict out, size_t *outlen);
++extern bool base64_decode (const char *in, size_t inlen,
++			   char *out, size_t *outlen);
+ 
+ extern bool base64_decode_alloc (const char *in, size_t inlen,
+ 				 char **out, size_t *outlen);

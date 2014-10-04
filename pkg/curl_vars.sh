@@ -1,0 +1,6 @@
+PKG_CURL_CFLAGS=""
+PKG_CURL_LDFLAGS=""
+PKG_CURL_LIBS="-lidn -lrtmp -lz"
+[ ! -d "$ROORT_DIR/bin/$ARCH/openssl" ] && PKG_CURL_LIBS="$PKG_CURL_LIBS -lssl -lcrypto"
+PKGCFG_CURL_CFLAGS="-I$ROOT_DIR/bin/$ARCH/curl_dev/usr/include"
+PKGCFG_CURL_LIBS="-lcurl"
