@@ -13,6 +13,8 @@ for name in nsgenbind; do
 	[ $STATUS = 0 ] || break
 done
 if [ $STATUS = 0 ]; then
+	NETSURF_ALL_GTKX_CFLAGS="`"$PKG_CONFIG" --cflags gtk+-3.0`"
+	NETSURF_ALL_GTKX_LIBS="`"$PKG_CONFIG" --libs gtk+-3.0`"
 	for name in buildsystem libwapcaplet libparserutils libcss libhubbub libdom libnsbmp libnsgif librosprite libsvgtiny nsgenbind netsurf; do
 		PATH="$PATH:$ROOT_DIR/build/$ARCH/$PKG_NAME/nsgenbind-host/bin" \
 		make -C $name clean \
@@ -50,9 +52,9 @@ NETSURF_GTK_MAJOR=3"
 			PREFIX="$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr" \
 			CC="$MUSL_GCC" \
 			CXX="$GXX_UC" \
-			CFLAGS="$PKG_CFLAGS $PKG_GTKX_CFLAGS $PKGCFG_GTKX_CFLAGS -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/include -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/src -I$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/include $NETSURF_ALL_CFLAGS_NETSURF" \
-			CXXFLAGS="$PKG_CFLAGS $PKG_GTKX_CFLAGS $PKGCFG_GTKX_CFLAGS -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/include -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/src -I$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/include $NETSURF_ALL_CFLAGS_NETSURF" \
-			LDFLAGS="$PKG_LDFLAGS $PKG_GTKX_LDFLAGS $PKG_LIBS $PKG_GTKX_LIBS $PKG_CURL_LIBS $PKGCFG_GTKX_LIBS $PKGCFG_CURL_LIBS -L$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib $NETSURF_ALL_LIBS_NETSURF -lssl -lcrypto" \
+			CFLAGS="$PKG_CFLAGS $NETSURF_ALL_GTKX_CFLAGS -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/include -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/src -I$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/include $NETSURF_ALL_CFLAGS_NETSURF" \
+			CXXFLAGS="$PKG_CFLAGS $NETSURF_ALL_GTKX_CFLAGS -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/include -I$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name/src -I$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/include $NETSURF_ALL_CFLAGS_NETSURF" \
+			LDFLAGS="$PKG_LDFLAGS $NETSURF_ALL_GTKX_LIBS -L$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib $NETSURF_ALL_LIBS_NETSURF -lcurl -lidn -lrtmp -lssl -lcrypto -lz" \
 			CURDIR="$ROOT_DIR/build/$ARCH/$PKG_NAME/$PKG_NAME-$PKG_VERSION/$name" \
 			$NETSURF_ALL_MAKECFLAGS_NETSURF \
 			PKG_CONFIG=true
@@ -61,6 +63,11 @@ NETSURF_GTK_MAJOR=3"
 	done
 fi
 if [ $STATUS = 0 ]; then
+	for file in "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/pkgconfig"/*.pc; do
+		cp "$file" "$file.orig"
+		sed "s@$ROOT_DIR/bin/$ARCH/$PKG_NAME@@g" "$file.orig" > "$file"
+		rm -f "$file.orig"
+	done
 	for size in 24x24; do
 		mkdir -p "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/icons/hicolor/$size/apps"
 		convert -resize $size -gravity center -crop $size "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/netsurf/netsurf.xpm" "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/icons/hicolor/$size/apps/netsurf.png"

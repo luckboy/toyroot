@@ -1,5 +1,0 @@
-PKG_TIFF_CFLAGS=""
-PKG_TIFF_LDFLAGS=""
-PKG_TIFF_LIBS="-llzma -ljpeg -lz"
-PKGCFG_TIFF_CFLAGS="-I$ROOT_DIR/bin/$ARCH/tiff_dev/usr/include"
-PKGCFG_TIFF_LIBS="-ltiff"

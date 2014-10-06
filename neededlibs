@@ -1,0 +1,80 @@
+#!/bin/sh
+# Copyright (c) 2014 Łukasz Szpakowski.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+
+ROOT_DIR="`dirname $0`"
+. "$ROOT_DIR/tmp/neededlibs.txt"
+
+
+READELF=readelf
+[ "$TARGET" != "$HOST" ] && READELF="$TARGET-readelf"
+
+ALL_LIB_FILES=
+for lib in "$ROOT_DIR/bin/$ARCH"/*/lib/lib*.so \
+	"$ROOT_DIR/bin/$ARCH"/*/lib/lib*.so.* \
+	"$ROOT_DIR/bin/$ARCH"/*/usr/lib/lib*.so \
+	"$ROOT_DIR/bin/$ARCH"/*/usr/lib/lib*.so.*; do
+	ALL_LIB_FILES="$ALL_LIB_FILES $lib"
+done
+
+find_lib() {
+	local NAME="`echo "$1" | sed 's/-l//'`"
+	for file in $ALL_LIB_FILES; do
+		case "$file" in
+			"$ROOT_DIR/bin/$ARCH"/*/lib/lib"$NAME".so)		echo "$file" && break;;
+			"$ROOT_DIR/bin/$ARCH"/*/lib/lib"$NAME".so.*)		echo "$file" && break;;
+			"$ROOT_DIR/bin/$ARCH"/*/usr/lib/lib"$NAME".so)		echo "$file" && break;;
+			"$ROOT_DIR/bin/$ARCH"/*/usr/lib/lib"$NAME".so.*)	echo "$file" && break;;
+		esac
+	done
+}
+
+get_needed_lib_from_file() {
+	"$READELF" -d "$1" | grep '(NEEDED)' | awk '{ l=$5; gsub("[\\[\\]]", "", l); gsub("\\.so$", "", l); gsub("\\.so..*$", "", l); gsub("^lib", "-l", l); print l; }' | sed 's/^-lc$//'
+}
+
+recursively_get_needed_libs() {
+	echo "$1"
+	local LIB_FILE="`find_lib $1`"
+	if [ -f "$LIB_FILE" ]; then
+		for lib in `get_needed_lib_from_file "$LIB_FILE"`; do
+			recursively_get_needed_libs "$lib"
+		done
+	fi
+}
+
+for arg in $*; do
+	case $arg in
+		-l*)
+			echo `recursively_get_needed_libs "$arg"`
+			;;
+		*)
+			echo "$arg"
+			;;
+	esac
+done

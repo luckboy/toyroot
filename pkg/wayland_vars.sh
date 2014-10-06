@@ -1,7 +1,0 @@
-PKG_WAYLAND_CFLAGS=""
-PKG_WAYLAND_LDFLAGS=""
-PKG_WAYLAND_LIBS="-lffi"
-PKGCFG_WAYLAND_CFLAGS="-I$ROOT_DIR/bin/$ARCH/wayland_dev/usr/include"
-PKGCFG_WAYLAND_SERVER_LIBS="-lwayland-server"
-PKGCFG_WAYLAND_CLIENT_LIBS="-lwayland-client"
-PKGCFG_WAYLAND_CURSOR_LIBS="-lwayland-client -lwayland-cursor"

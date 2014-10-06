@@ -30,6 +30,7 @@
 
 GCC="${GCC:=gcc}"
 GCC_CFLAGS="${CFLAGS:=-Os}"
+PKG_CONFIG="${PKG_CONFIG:=pkg-config}"
 
 GXX="`echo "$GCC" | sed -e s/gcc$/g++/`"
 OBJCOPY="`echo "$GCC" | sed -e s/gcc$/objcopy/`"
@@ -88,6 +89,9 @@ done
 export REALGCC="$GCC"
 export WRAPPER_INCLUDEDIR="-I$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/include"
 export WRAPPER_LIBDIR="-L$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/lib"
+
+initialize_pkg_config
+export PKG_CONFIG=""
 
 download_source musl-$MUSL_VERSION.tar.gz $MUSL_DOWNLOAD_URL
 download_source ncurses-$NCURSES_VERSION.tar.gz $NCURSES_DOWNLOAD_URL
@@ -244,7 +248,6 @@ if [ ! -d "$ROOT_DIR/bin/$ARCH/util-linux-mount" ]; then
 		--without-systemd \
 		--without-python \
 		--without-systemdsystemunitdir \
-		PKG_CONFIG="" \
 		&& make install DESTDIR="$ROOT_DIR/bin/$ARCH/util-linux") || exit 1
 	for file in $TOYBOX_FILES; do
 		if [ -e "$ROOT_DIR/bin/$ARCH/util-linux/$file" -a ! -d "$ROOT_DIR/bin/$ARCH/util-linux/$file" ]; then 
@@ -373,9 +376,9 @@ case "$ARCH" in
 		fi
 		;;
 esac
-
 INIT_PKG_CFLAGS="$GCC_CFLAGS -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include -I$ROOT_DIR/bin/$ARCH/ncurses/usr/include/ncurses"
 INIT_PKG_LDFLAGS="-L$ROOT_DIR/bin/$ARCH/ncurses/usr/lib -L$ROOT_DIR/bin/$ARCH/libedit/usr/lib -s"
 INIT_PKG_LIBS=""
+export PKG_CONFIG="$ROOT_DIR/pkg-config"
 process_extra_packages build_extra_package
-exit 0
+exit $?

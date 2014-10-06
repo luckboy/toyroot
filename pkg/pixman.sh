@@ -1,5 +1,2 @@
 [ -f Makefile ] && make clean
-CC="$MUSL_GCC" CCAS="$MUSL_GCC" CFLAGS="$PKG_CFLAGS $PKG_LIBPNG_CFLAGS" CCASFLAGS="$PKG_CFLAGS $PKG_LIBPNG_CFLAGS" LDFLAGS="$PKG_LDFLAGS $PKG_LIBPNG_LDFLAGS" LIBS="$PKG_LIBS $PKG_LIBPNG_LIBS" STRIP="$STRIP" \
-PNG_CFLAGS="$PKGCFG_LIBPNG_CFLAGS" \
-PNG_LIBS="$PKGCFG_LIBPNG_LIBS" \
-./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-gtk && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"
+CC="$MUSL_GCC" CCAS="$MUSL_GCC" CFLAGS="$PKG_CFLAGS" CCASFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS" STRIP="$STRIP" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-gtk && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"

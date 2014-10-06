@@ -1,0 +1,110 @@
+#!/bin/sh
+# Copyright (c) 2014 Łukasz Szpakowski.
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+ROOT_DIR="`dirname $0`"
+. "$ROOT_DIR/tmp/pkg-config.txt"
+
+NEEDEDLIBS="$ROOT_DIR/neededlibs"
+
+ARE_CFLAGS_OR_LIBS=false
+for arg in $*; do
+	case "$arg" in
+		--cflags*|--libs*)
+			ARE_CFLAGS_OR_LIBS=true
+			;;
+	esac
+done
+
+if [ -f "$ROOT_DIR/tmp/pkg-config_package_list.txt" ]; then
+	PKGS="`cat "$ROOT_DIR/tmp/pkg-config_package_list.txt"`"
+else
+	PKGS=""
+	for dir in "$ROOT_DIR/bin/$ARCH"/*_dev; do
+		PKGS="$PKGS `basename $dir _dev`"
+	done
+fi
+
+PKG_CONFIG_PATH=""
+for pkg in $PKGS; do
+	dir="$ROOT_DIR/bin/$ARCH/$pkg""_dev"
+	[ -d "$dir/usr/lib/pkgconfig" ] && PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$dir/usr/lib/pkgconfig"
+	[ -d "$dir/usr/share/pkgconfig" ] && PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$dir/usr/share/pkgconfig"
+done
+PKG_CONFIG_LIBDIR="$ROOT_DIR/tmp/pkgconfig"
+PKG_CONFIG_SYSROOT_DIR=""
+export PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR
+
+LAST_LINE=""
+IS_LAST_LINE=false
+"$PKG_CONFIG" $* | (while read line; do
+	[ $IS_LAST_LINE = true ] && echo "$LAST_LINE"
+	LAST_LINE="$line"
+	IS_LAST_LINE=true
+done
+if [ $IS_LAST_LINE = true ]; then
+	if [ $ARE_CFLAGS_OR_LIBS = true ]; then
+		NEW_LAST_LINE=""
+		SEP=""
+		for arg in $LAST_LINE; do
+			case "$arg" in
+				-I/*)
+					INCLUDE_DIR="`echo "$arg" | sed 's@^-I/@@'`"
+					for pkg in $PKGS; do
+						dir="$ROOT_DIR/bin/$ARCH/$pkg""_dev"
+						if [ -d "$dir/$INCLUDE_DIR" ]; then
+							NEW_LAST_LINE="$NEW_LAST_LINE$SPACE-I$dir/$INCLUDE_DIR"
+						fi
+					done
+					;;
+				-L/*)
+					LIB_DIR="`echo "$arg" | sed 's@^-L/@@'`"
+					for pkg in $PKGS; do
+						dir1="$ROOT_DIR/bin/$ARCH/$pkg"
+						if [ -d "$dir1/$LIB_DIR" ]; then
+							NEW_LAST_LINE="$NEW_LAST_LINE$SPACE-L$dir1/$LIB_DIR"
+						fi
+						dir2="$ROOT_DIR/bin/$ARCH/$pkg""_dev"
+						if [ -d "$dir2/$LIB_DIR" ]; then
+							NEW_LAST_LINE="$NEW_LAST_LINE$SPACE-L$dir2/$LIB_DIR"
+						fi
+					done
+					;;
+				*)
+					NEW_LAST_LINE="$NEW_LAST_LINE$SPACE$arg"
+					;;
+			esac
+			SPACE=" "
+		done
+		NEW_LAST_LINE="`"$NEEDEDLIBS" $NEW_LAST_LINE`"
+		echo "`echo $NEW_LAST_LINE`"
+	else
+		echo "$LAST_LINE"
+	fi
+fi)
+"$PKG_CONFIG" $* > /dev/null
+exit $?

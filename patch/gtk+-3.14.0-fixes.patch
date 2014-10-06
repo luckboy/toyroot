@@ -1,165 +1,6 @@
-diff -Naur old/gtk+-3.14.0/configure new/gtk+-3.14.0/configure
---- old/gtk+-3.14.0/configure	2014-09-22 05:40:44.000000000 +0200
-+++ new/gtk+-3.14.0/configure	2014-09-25 21:33:44.254644213 +0200
-@@ -22287,20 +22287,20 @@
-   return 0;
- }
- _ACEOF
--if ac_fn_c_try_link "$LINENO"; then :
--   echo "*** The test program compiled, but did not run. This usually means"
--          echo "*** that the run-time linker is not finding GLIB or finding the wrong"
--          echo "*** version of GLIB. If it is not finding GLIB, you'll need to set your"
--          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
--          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
--          echo "*** is required on your system"
--	  echo "***"
--          echo "*** If you have an old version installed, it is best to remove it, although"
--          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
--else
--   echo "*** The test program failed to compile or link. See the file config.log for the"
--          echo "*** exact error that occured. This usually means GLIB is incorrectly installed."
--fi
-+#if ac_fn_c_try_link "$LINENO"; then :
-+#   echo "*** The test program compiled, but did not run. This usually means"
-+#          echo "*** that the run-time linker is not finding GLIB or finding the wrong"
-+#          echo "*** version of GLIB. If it is not finding GLIB, you'll need to set your"
-+#          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-+#          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-+#          echo "*** is required on your system"
-+#	  echo "***"
-+#          echo "*** If you have an old version installed, it is best to remove it, although"
-+#          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-+#else
-+#   echo "*** The test program failed to compile or link. See the file config.log for the"
-+#          echo "*** exact error that occured. This usually means GLIB is incorrectly installed."
-+#fi
- rm -f core conftest.err conftest.$ac_objext \
-     conftest$ac_exeext conftest.$ac_ext
-           CFLAGS="$ac_save_CFLAGS"
-@@ -22313,9 +22313,9 @@
-      GOBJECT_QUERY=""
-      GLIB_MKENUMS=""
-      GLIB_COMPILE_RESOURCES=""
--     as_fn_error $? "
--*** GLIB 2.41.2 or better is required. The latest version of
--*** GLIB is always available from ftp://ftp.gtk.org/pub/gtk/." "$LINENO" 5
-+#     as_fn_error $? "
-+#*** GLIB 2.41.2 or better is required. The latest version of
-+#*** GLIB is always available from ftp://ftp.gtk.org/pub/gtk/." "$LINENO" 5
-   fi
- 
- 
-@@ -24414,57 +24414,57 @@
- 
- # Check for Pango flags
- 
--{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Pango flags" >&5
--$as_echo_n "checking Pango flags... " >&6; }
--if $PKG_CONFIG --exists $PANGO_PACKAGES ; then
--        PANGO_CFLAGS=`$PKG_CONFIG --cflags $PANGO_PACKAGES`
--        PANGO_LIBS=`$PKG_CONFIG --libs $PANGO_PACKAGES`
--
--        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PANGO_CFLAGS $PANGO_LIBS" >&5
--$as_echo "$PANGO_CFLAGS $PANGO_LIBS" >&6; }
--else
--        as_fn_error $? "
--*** Pango not found. Pango built with Cairo support is required
--*** to build GTK+. See http://www.pango.org for Pango information.
--" "$LINENO" 5
--fi
--
--CFLAGS="$CFLAGS $PANGO_CFLAGS"
--
--if $PKG_CONFIG --uninstalled $PANGO_PACKAGES; then
--        :
--else
--	gtk_save_LIBS="$LIBS"
--        LIBS="$PANGO_LIBS $LIBS"
--        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
--/* end confdefs.h.  */
-+#{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Pango flags" >&5
-+#$as_echo_n "checking Pango flags... " >&6; }
-+#if $PKG_CONFIG --exists $PANGO_PACKAGES ; then
-+#        PANGO_CFLAGS=`$PKG_CONFIG --cflags $PANGO_PACKAGES`
-+#        PANGO_LIBS=`$PKG_CONFIG --libs $PANGO_PACKAGES`
-+#
-+#        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PANGO_CFLAGS $PANGO_LIBS" >&5
-+#$as_echo "$PANGO_CFLAGS $PANGO_LIBS" >&6; }
-+#else
-+#        as_fn_error $? "
-+#*** Pango not found. Pango built with Cairo support is required
-+#*** to build GTK+. See http://www.pango.org for Pango information.
-+#" "$LINENO" 5
-+#fi
- 
--/* Override any GCC internal prototype to avoid an error.
--   Use char because int might match the return type of a GCC
--   builtin and then its argument prototype would still apply.  */
--#ifdef __cplusplus
--extern "C"
--#endif
--char pango_context_new ();
--int
--main ()
--{
--return pango_context_new ();
--  ;
--  return 0;
--}
--_ACEOF
--if ac_fn_c_try_link "$LINENO"; then :
--  :
--else
--  as_fn_error $? "
--*** Can't link to Pango. Pango is required to build
--*** GTK+. For more information see http://www.pango.org" "$LINENO" 5
--fi
--rm -f core conftest.err conftest.$ac_objext \
--    conftest$ac_exeext conftest.$ac_ext
--        LIBS="$gtk_save_LIBS"
--fi
-+#CFLAGS="$CFLAGS $PANGO_CFLAGS"
-+#
-+#if $PKG_CONFIG --uninstalled $PANGO_PACKAGES; then
-+#        :
-+#else
-+#	gtk_save_LIBS="$LIBS"
-+#        LIBS="$PANGO_LIBS $LIBS"
-+#        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-+#/* end confdefs.h.  */
-+#
-+#/* Override any GCC internal prototype to avoid an error.
-+#   Use char because int might match the return type of a GCC
-+#   builtin and then its argument prototype would still apply.  */
-+##ifdef __cplusplus
-+#extern "C"
-+##endif
-+#char pango_context_new ();
-+#int
-+#main ()
-+#{
-+#return pango_context_new ();
-+#  ;
-+#  return 0;
-+#}
-+#_ACEOF
-+#if ac_fn_c_try_link "$LINENO"; then :
-+#  :
-+#else
-+#  as_fn_error $? "
-+#*** Can't link to Pango. Pango is required to build
-+#*** GTK+. For more information see http://www.pango.org" "$LINENO" 5
-+#fi
-+#rm -f core conftest.err conftest.$ac_objext \
-+#    conftest$ac_exeext conftest.$ac_ext
-+#        LIBS="$gtk_save_LIBS"
-+#fi
- 
- # Check for cairo_set_device_scale, as we don't want to depend hard on
- # this until there is a stable release with it
 diff -Naur old/gtk+-3.14.0/gtk/updateiconcache.c new/gtk+-3.14.0/gtk/updateiconcache.c
 --- old/gtk+-3.14.0/gtk/updateiconcache.c	2014-08-15 16:38:05.000000000 +0200
-+++ new/gtk+-3.14.0/gtk/updateiconcache.c	2014-09-28 19:23:29.735182410 +0200
++++ new/gtk+-3.14.0/gtk/updateiconcache.c	2014-10-06 16:44:31.524509760 +0200
 @@ -1755,6 +1755,9 @@
    if (!force_update && is_cache_up_to_date (path))
      return 0;
@@ -172,7 +13,7 @@ diff -Naur old/gtk+-3.14.0/gtk/updateiconcache.c new/gtk+-3.14.0/gtk/updateiconc
  
 diff -Naur old/gtk+-3.14.0/tests/testgtk.c new/gtk+-3.14.0/tests/testgtk.c
 --- old/gtk+-3.14.0/tests/testgtk.c	2014-09-04 20:11:33.000000000 +0200
-+++ new/gtk+-3.14.0/tests/testgtk.c	2014-09-28 19:53:18.295155859 +0200
++++ new/gtk+-3.14.0/tests/testgtk.c	2014-10-06 16:44:31.524509760 +0200
 @@ -4966,7 +4966,7 @@
  			"GtkWidget::visible", TRUE,
  			NULL);
@@ -184,7 +25,7 @@ diff -Naur old/gtk+-3.14.0/tests/testgtk.c new/gtk+-3.14.0/tests/testgtk.c
  #endif
 diff -Naur old/gtk+-3.14.0/util/Makefile.in new/gtk+-3.14.0/util/Makefile.in
 --- old/gtk+-3.14.0/util/Makefile.in	2014-09-22 05:40:51.000000000 +0200
-+++ new/gtk+-3.14.0/util/Makefile.in	2014-09-28 19:27:56.511178450 +0200
++++ new/gtk+-3.14.0/util/Makefile.in	2014-10-06 16:44:31.524509760 +0200
 @@ -195,18 +195,18 @@
  CAIRO_REQUIRED_VERSION = @CAIRO_REQUIRED_VERSION@
  CATALOGS = @CATALOGS@

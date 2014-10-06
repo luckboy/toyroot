@@ -1,10 +1,5 @@
 [ -f Makefile ] && make clean
-CC="$MUSL_GCC" CFLAGS="$PKG_CFLAGS $PKG_GTKX_CFLAGS $PKG_LIBCROCO_CFLAGS $PKGCFG_GTKX_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS $PKG_GTKX_LIBS $PKG_LIBCROCO_LIBS $PKGCFG_GTKX_LIBS $PKGCFG_LIBCROCO_LIBS" STRIP="$STRIP" \
-LIBRSVG_CFLAGS="$PKGCFG_GLIB_CFLAGS $PKGCFG_PANGO_CFLAGS $PKGCFG_CAIRO_GOBJECT_CFLAGS $PKGCFG_LIBCROCO_CFLAGS" \
-LIBRSVG_LIBS="$PKGCFG_GLIB_LIBS $PKGCFG_PANGO_LIBS $PKGCFG_CAIRO_GOBJECT_LIBS $PKGCFG_LIBCROCO_LIBS" \
-RSVG_CONVERT_CFLAGS="$PKGCFG_PANGO_CFLAGS $PKGCFG_CAIRO_GOBJECT_CFLAGS $PKGCFG_LIBCROCO_CFLAGS" \
-RSVG_CONVERT_LIBS="$PKGCFG_PANGO_LIBS $PKGCFG_CAIRO_GOBJECT_CFLAGS $PKGCFG_LIBCROCO_LIBS" \
-./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-introspection && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME" gdk_pixbuf_binarydir=/usr/lib/gdk-pixbuf-2.0/2.10.0/ gdk_pixbuf_cache_file=/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache gdk_pixbuf_moduledir=/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+CC="$MUSL_GCC" CFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS" STRIP="$STRIP" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-introspection && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME" gdk_pixbuf_binarydir=/usr/lib/gdk-pixbuf-2.0/2.10.0/ gdk_pixbuf_cache_file=/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache gdk_pixbuf_moduledir=/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
 STATUS=$?
 [ $STATUS = 0 ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders"/*.la
 [ $STATUS = 0 ]

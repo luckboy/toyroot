@@ -338,6 +338,10 @@ set_extra_package_libs() {
 	PKG_LIBS="$INIT_PKG_LIBS"
 }
 
+set_pkg_config_package_list() {
+	echo "$DEV_PKGS" > "$ROOT_DIR/tmp/pkg-config_package_list.txt"
+}
+
 extra_package_name() {
 	echo "$1"
 }
@@ -358,6 +362,7 @@ build_extra_package() {
 	set_extra_package_cflags
 	set_extra_package_ldflags
 	set_extra_package_libs
+	set_pkg_config_package_list
 	if [ ! -d "bin/$ARCH/$PKG_NAME" ]; then
 		local PKG_SRC="`echo "$PKG_SRC_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/" -e "s/%e/$PKG_SRC_EXT/"`"
 		local PKG_BUILD_DIR="`echo "$PKG_BUILD_DIR_FORMAT" | sed -e "s/%p/$PKG_NAME/" -e "s/%v/$PKG_VERSION/"`"
@@ -376,13 +381,13 @@ build_extra_package() {
 		[ ! -d "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR" ] && mkdir -p "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR"
 		cd "build/$ARCH/$PKG_NAME/$PKG_BUILD_DIR"
 		if [ -f "$ROOT_DIR/pkg/$PKG_NAME.sh" ]; then
-			. "$ROOT_DIR/pkg/$PKG_NAME.sh" || exit 1
+			. "$ROOT_DIR/pkg/$PKG_NAME.sh"
 		else
 			[ -f Makefile ] && make clean
-			(CC="$MUSL_GCC" CXX="$GXX_UC" CFLAGS="$PKG_CFLAGS" CXXFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS" STRIP="$STRIP" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME") || exit 1
+			CC="$MUSL_GCC" CXX="$GXX_UC" CFLAGS="$PKG_CFLAGS" CXXFLAGS="$PKG_CFLAGS" LDFLAGS="$PKG_LDFLAGS" LIBS="$PKG_LIBS" STRIP="$STRIP" ./configure --host="$TARGET" --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install DESTDIR="$ROOT_DIR/bin/$ARCH/$PKG_NAME"
 		fi
-		cd "$SAVED_PWD"
 		[ $? != 0 ] && exit 1
+		cd "$SAVED_PWD"
 		[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/lib/charset.alias" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/lib/charset.alias"	
 		[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/charset.alias" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/lib/charset.alias"	
 		[ -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/info/dir" ] && rm -f "$ROOT_DIR/bin/$ARCH/$PKG_NAME/usr/share/info/dir"	
@@ -391,7 +396,6 @@ build_extra_package() {
 		create_doc_package_from_package "$PKG_NAME"
 		[ -f "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh" ] && . "$ROOT_DIR/pkg/$PKG_NAME""_postinstall.sh"
 	fi
-	[ -f "pkg/$PKG_NAME""_vars.sh" ] && . "pkg/$PKG_NAME""_vars.sh"
 	[ -d "bin/$ARCH/$PKG_NAME"_dev ] && DEV_PKGS="$DEV_PKGS $PKG_NAME"
 }
 
@@ -465,4 +469,13 @@ install_all_infos() {
 			"$INSTALL_INFO" --info-dir="$PKG_ROOT_DIR/usr/share/info" --info-file="$i"
 		done
 	fi
+}
+
+initialize_pkg_config() {
+	echo "ARCH=\"$ARCH\"" > tmp/pkg-config.txt
+	echo "PKG_CONFIG=\"$PKG_CONFIG\"" >> tmp/pkg-config.txt
+	echo "ARCH=\"$ARCH\"" > tmp/neededlibs.txt
+	echo "TARGET=\"$TARGET\"" >> tmp/neededlibs.txt
+	echo "HOST=\"$HOST\"" >> tmp/neededlibs.txt
+	mkdir -p tmp/pkgconfig
 }

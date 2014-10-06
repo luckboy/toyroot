@@ -1,6 +1,24 @@
+diff -Naur old/strace-4.9/defs.h new/strace-4.9/defs.h
+--- old/strace-4.9/defs.h	2014-08-09 01:38:26.000000000 +0200
++++ new/strace-4.9/defs.h	2014-10-06 01:03:16.525348126 +0200
+@@ -159,13 +159,7 @@
+ # include <sys/ptrace.h>
+ #endif
+ 
+-#if defined(POWERPC)
+-# include <asm/ptrace.h>
+-#endif
+-
+-#if defined(TILE)
+-# include <asm/ptrace.h>  /* struct pt_regs */
+-#endif
++#include <asm/ptrace.h>  /* struct pt_regs */
+ 
+ #ifndef ERESTARTSYS
+ # define ERESTARTSYS    512
 diff -Naur old/strace-4.9/signal.c new/strace-4.9/signal.c
 --- old/strace-4.9/signal.c	2014-08-15 01:29:09.000000000 +0200
-+++ new/strace-4.9/signal.c	2014-10-04 14:41:29.396148732 +0200
++++ new/strace-4.9/signal.c	2014-10-04 14:43:22.376147055 +0200
 @@ -447,7 +447,7 @@
  				printsigsource(sip);
  				break;
