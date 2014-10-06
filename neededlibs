@@ -26,10 +26,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-
 ROOT_DIR="`dirname $0`"
 . "$ROOT_DIR/tmp/neededlibs.txt"
-
 
 READELF=readelf
 [ "$TARGET" != "$HOST" ] && READELF="$TARGET-readelf"
@@ -54,17 +52,28 @@ find_lib() {
 	done
 }
 
-get_needed_lib_from_file() {
+get_needed_libs_from_file() {
 	"$READELF" -d "$1" | grep '(NEEDED)' | awk '{ l=$5; gsub("[\\[\\]]", "", l); gsub("\\.so$", "", l); gsub("\\.so..*$", "", l); gsub("^lib", "-l", l); print l; }' | sed 's/^-lc$//'
 }
 
 recursively_get_needed_libs() {
-	echo "$1"
-	local LIB_FILE="`find_lib $1`"
+	local LIB=$1
+	echo "$LIB"
+	local LIB_FILE="`find_lib "$LIB"`"
 	if [ -f "$LIB_FILE" ]; then
-		for lib in `get_needed_lib_from_file "$LIB_FILE"`; do
-			recursively_get_needed_libs "$lib"
-		done
+		local NEEDED_LIBS=""
+		local CACHE_DIR="$ROOT_DIR/tmp/neededlibs_cache/$ARCH"
+		local CACHE_FILE="$CACHE_DIR/$LIB"
+		if [ -e "$CACHE_FILE" -a ! \( "$LIB_FILE" -nt "$CACHE_FILE" \) ]; then
+			cat "$CACHE_FILE"
+		else
+			NEEDED_LIBS=$(for lib in `get_needed_libs_from_file "$LIB_FILE"`; do
+				recursively_get_needed_libs "$lib"
+			done)
+			mkdir -p "$CACHE_DIR"
+			echo $NEEDED_LIBS > "$CACHE_FILE"
+			echo $NEEDED_LIBS
+		fi
 	fi
 }
 

@@ -478,4 +478,5 @@ initialize_pkg_config() {
 	echo "TARGET=\"$TARGET\"" >> tmp/neededlibs.txt
 	echo "HOST=\"$HOST\"" >> tmp/neededlibs.txt
 	mkdir -p tmp/pkgconfig
+	rm -fr "tmp/neededlibs_cache/$ARCH"
 }
