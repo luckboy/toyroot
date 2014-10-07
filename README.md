@@ -17,6 +17,7 @@ the /etc/network.conf file.
 
 The built system contains the following core packages:
 
+  * linux-libc-dev (kernel headers)
   * musl
   * ncurses
   * libedit
@@ -57,8 +58,9 @@ This build system contains scripts:
 
 The toyroot directory contains the following subdirectories:
 
-  * etc - configuration directory
+  * etc - system configuration directory
   * patch - directory with patches
+  * config - package configuration directory
 
 After compilation, this directory also contains the subdirectories:
 
@@ -67,6 +69,7 @@ After compilation, this directory also contains the subdirectories:
   * bin - directory of binary packages
   * kernel_config -  directory of kernel configurations
   * profile - directory of system configuration for specified profiles
+  * tmp - temporary directory
 
 After generating of root file system, the directory also contains the subdirectory:
 
@@ -132,6 +135,7 @@ Options of this script:
                                         (default: package-list.txt).
         --all-pkgs                      compile all packages.
         --no-extra-pkgs                 just compile non-extra packages.
+        --external-kernel-headers       use external kernel headers to compile packages.
 
 Example:
 

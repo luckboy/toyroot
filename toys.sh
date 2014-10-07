@@ -61,6 +61,7 @@ esac
 PKGS=""
 ALL_PKGS=false
 NO_EXTRA_PKGS=false
+EXTERNAL_KERNEL_HEADERS=false
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--pkg-list-file)
@@ -75,6 +76,9 @@ while [ $# -gt 0 ]; do
 			;;
 		--no-extra-pkgs)
 			NO_EXTRA_PKGS=true
+			;;
+		--external-kernel-headers)
+			EXTERNAL_KERNEL_HEADERS=true
 			;;
 		*)
 			PKGS="$PKGS $1"
@@ -93,6 +97,39 @@ export WRAPPER_LIBDIR="-L$ROOT_DIR/bin/$ARCH/uClibc++-build/usr/uClibc++/lib"
 initialize_pkg_config
 export PKG_CONFIG=""
 
+DEB_ARCH="$ARCH"
+DEB_TARGET="$ARCH-linux-gnu"
+case "$ARCH" in
+	arm)
+		case "$TARGET" in
+			*hf)	
+				DEB_ARCH=armhf
+				DEB_TARGET=arm-linux-gnueabihf
+				;;
+			*)	
+				DEB_ARCH=armel
+				DEB_TARGET=arm-linux-gnueabi
+				;;
+		esac
+		;;
+	armhf)
+		DEB_TARGET=arm-linux-gnueabihf
+		;;
+	x86_64)
+		DEB_ARCH=amd64
+		;;
+	i[3-9]86)
+		DEB_ARCH=i386
+		DEB_TARGET=i386-linux-gnu
+		;;
+	ia64|mips|mipsel|powerpc|s360|s360x|sparc)
+		;;
+	*)
+		EXTERNAL_KERNEL_HEADERS=true
+		;;
+esac
+
+[ $EXTERNAL_KERNEL_HEADERS != true ] && download_source linux-libc-dev_"$LINUX_LIBC_DEV_VERSION"_"$DEB_ARCH".deb $LINUX_LIBC_DEV_DOWNLOAD_URL
 download_source musl-$MUSL_VERSION.tar.gz $MUSL_DOWNLOAD_URL
 download_source ncurses-$NCURSES_VERSION.tar.gz $NCURSES_DOWNLOAD_URL
 download_source libedit-$LIBEDIT_VERSION.tar.gz $LIBEDIT_DOWNLOAD_URL
@@ -105,6 +142,12 @@ download_source util-linux-$UTIL_LINUX_VERSION.tar.xz $UTIL_LINUX_DOWNLOAD_URL
 download_source uClibc++-$UCLIBCXX_VERSION.tar.xz $UCLIBCXX_DOWNLOAD_URL
 download_source shadow-$SHADOW_VERSION.tar.xz $SHADOW_DOWNLOAD_URL
 
+if [ $EXTERNAL_KERNEL_HEADERS != true -a ! -d "build/$ARCH/linux-libc-dev" ]; then
+	mkdir -p "build/$ARCH/linux-libc-dev/deb"
+	cd "build/$ARCH/linux-libc-dev/deb"
+	ar x ../../../../src/linux-libc-dev_"$LINUX_LIBC_DEV_VERSION"_"$DEB_ARCH".deb
+	cd ../../../..
+fi
 extract_and_patch_package musl musl-$MUSL_VERSION.tar.gz musl-$MUSL_VERSION
 extract_and_patch_package ncurses ncurses-$NCURSES_VERSION.tar.gz ncurses-$NCURSES_VERSION
 extract_and_patch_package libedit libedit-$LIBEDIT_VERSION.tar.gz libedit-$LIBEDIT_VERSION
@@ -128,6 +171,16 @@ esac
 
 mkdir -p "$ROOT_DIR/bin/$ARCH"
 
+if [ $EXTERNAL_KERNEL_HEADERS != true -a "$ROOT_DIR/bin/$ARCH/linux-libc-dev/deb" ]; then
+	mkdir -p "$ROOT_DIR/bin/$ARCH/linux-libc-dev"
+	tar Jxf "build/$ARCH/linux-libc-dev/deb/data.tar.xz" -C "$ROOT_DIR/bin/$ARCH/linux-libc-dev" || exit 1
+	echo -n > "bin/$ARCH/linux-libc-dev.nonextra"
+	INCLUDE_DIR="$ROOT_DIR/bin/$ARCH/linux-libc-dev/usr/include"
+	ASM_INCLUDE_DIR="$INCLUDE_DIR/$DEB_TARGET/asm"
+	ASM_GENERIC_INCLUDE_DIR="$INCLUDE_DIR/asm-generic"
+	LINUX_INCLUDE_DIR="$INCLUDE_DIR/linux"
+	MTD_INCLUDE_DIR="$INCLUDE_DIR/mtd"
+fi
 if [ ! -d "$ROOT_DIR/bin/$ARCH/musl" ]; then
 	cd "build/$ARCH/musl/musl-$MUSL_VERSION"
 	[ -f Makefile ] && make clean
