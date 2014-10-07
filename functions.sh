@@ -472,6 +472,7 @@ install_all_infos() {
 }
 
 initialize_pkg_config() {
+	mkdir -p tmp
 	echo "ARCH=\"$ARCH\"" > tmp/pkg-config.txt
 	echo "PKG_CONFIG=\"$PKG_CONFIG\"" >> tmp/pkg-config.txt
 	echo "ARCH=\"$ARCH\"" > tmp/neededlibs.txt
