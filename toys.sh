@@ -171,7 +171,7 @@ esac
 
 mkdir -p "$ROOT_DIR/bin/$ARCH"
 
-if [ $EXTERNAL_KERNEL_HEADERS != true -a "$ROOT_DIR/bin/$ARCH/linux-libc-dev/deb" ]; then
+if [ $EXTERNAL_KERNEL_HEADERS != true -a ! -d "$ROOT_DIR/bin/$ARCH/linux-libc-dev" ]; then
 	mkdir -p "$ROOT_DIR/bin/$ARCH/linux-libc-dev"
 	tar Jxf "build/$ARCH/linux-libc-dev/deb/data.tar.xz" -C "$ROOT_DIR/bin/$ARCH/linux-libc-dev" || exit 1
 	echo -n > "bin/$ARCH/linux-libc-dev.nonextra"
