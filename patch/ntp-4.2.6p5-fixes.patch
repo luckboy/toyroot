@@ -1,0 +1,28 @@
+diff -Naur old/ntp-4.2.6p5/util/tickadj.c new/ntp-4.2.6p5/util/tickadj.c
+--- old/ntp-4.2.6p5/util/tickadj.c	2010-12-25 10:40:34.000000000 +0100
++++ new/ntp-4.2.6p5/util/tickadj.c	2014-10-20 20:07:56.935715237 +0200
+@@ -21,11 +21,11 @@
+ # include <unistd.h>
+ #endif /* HAVE_UNISTD_H */
+ 
+-#ifdef HAVE___ADJTIMEX		/* Linux */
+-
+ #include <sys/timex.h>
+ struct timex txc;
+ 
++#ifdef HAVE___ADJTIMEX		/* Linux */
++
+ #if 0
+ int
+ main(
+@@ -179,7 +179,9 @@
+ #else /* not NLIST_STRUCT */ /* was defined(SYS_AUX3) || defined(SYS_AUX2) */
+ # include <sys/resource.h>
+ # include <sys/file.h>
+-# include <a.out.h>
++# ifndef NOKMEM
++#  include <a.out.h>
++# endif
+ # ifdef HAVE_SYS_VAR_H
+ #  include <sys/var.h>
+ # endif

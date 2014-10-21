@@ -5,6 +5,8 @@ util-linux
 shadow
 iptables	1.4.21		tar.bz2		ftp://ftp.netfilter.org/pub/iptables
 toyroot-utils
+microperl	5.14.4		tar.gz		http://www.cpan.org/src/5.0					perl-%v.%e	perl-%v
+ntp		4.2.6p5		tar.gz		http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2
 grub
 grep		2.20		tar.xz		http://ftp.gnu.org/gnu/grep
 gzip		1.6		tar.xz		http://ftp.gnu.org/gnu/gzip
@@ -14,7 +16,6 @@ tar		1.28		tar.xz		http://ftp.gnu.org/gnu/tar
 less		468		tar.gz		http://www.greenwoodsoftware.com/less
 nano		2.3.6		tar.gz		http://www.nano-editor.org/dist/v2.3
 nvi		1.79		tar.gz		https://sites.google.com/a/bostic.com/keithbostic/files
-microperl	5.14.4		tar.gz		http://www.cpan.org/src/5.0					perl-%v.%e	perl-%v
 openssl		1.0.1i		tar.gz		https://www.openssl.org/source
 wget		1.15		tar.xz		http://ftp.gnu.org/gnu/wget
 links		2.8		tar.bz2		http://links.twibright.com/download

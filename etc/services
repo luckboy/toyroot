@@ -1,2 +1,4 @@
 ftp-data	20/tcp
 ftp		21/tcp
+ntp		123/tcp
+ntp		123/udp

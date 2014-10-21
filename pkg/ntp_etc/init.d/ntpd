@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "Starting ntpd ..."
+		ntpd -p /var/run/ntpd.pid
+		;;
+	stop)
+		echo "Stopping ntpd ..."
+		if [ -f /var/run/ntpd.pid ]; then
+			kill -15 "`cat /var/run/ntpd.pid`"
+			rm -f /var/run/ntpd.pid
+		fi
+		;;
+esac

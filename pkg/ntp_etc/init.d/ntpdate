@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /etc/ntpdate.conf
+
+case "$1" in
+	start)
+		echo "Starting ntpdate ..."
+		ntpdate $OPTS $SERVERS
+		;;
+	stop)
+		echo "Stopping ntpdate ..."
+		;;
+esac
