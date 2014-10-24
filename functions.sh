@@ -403,10 +403,10 @@ install_extra_package() {
 	local PKG_NAME="$1"
 	[ -f "bin/$ARCH/$PKG_NAME.nonextra" ] && return 0
 	mkdir -p "$PKG_ROOT_DIR"
-	[ -d "bin/$ARCH/$PKG_NAME" ] && cp -drp "bin/$ARCH/$PKG_NAME"/* "$PKG_ROOT_DIR"
+	is_non_empty_directory "bin/$ARCH/$PKG_NAME" && cp -drp "bin/$ARCH/$PKG_NAME"/* "$PKG_ROOT_DIR"
 	if [ "$PKG_SUFFIXES" != "" ]; then
 		for sfx in $PKG_SUFFIXES; do
-			[ -d "bin/$ARCH/$PKG_NAME""_$sfx" ] && cp -drp "bin/$ARCH/$PKG_NAME""_$sfx"/* "$PKG_ROOT_DIR"
+			is_non_empty_directory "bin/$ARCH/$PKG_NAME""_$sfx" && cp -drp "bin/$ARCH/$PKG_NAME""_$sfx"/* "$PKG_ROOT_DIR"
 		done
 	fi
 }

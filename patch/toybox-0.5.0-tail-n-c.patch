@@ -1,0 +1,50 @@
+--- old/toybox-0.5.0/toys/posix/tail.c	2014-10-02 14:47:08.000000000 +0200
++++ new/toybox-0.5.0/toys/posix/tail.c	2014-10-23 22:16:08.555395883 +0200
+@@ -41,6 +41,7 @@
+   struct line_list *next, *prev;
+   char *data;
+   int len;
++  int orig_len;
+ };
+ 
+ static struct line_list *get_chunk(int fd, int len)
+@@ -49,7 +50,7 @@
+ 
+   memset(line, 0, sizeof(struct line_list));
+   line->data = ((char *)line) + sizeof(struct line_list);
+-  line->len = readall(fd, line->data, len);
++  line->len = line->orig_len = readall(fd, line->data, len);
+ 
+   if (line->len < 1) {
+     free(line);
+@@ -156,10 +157,10 @@
+ 
+       // If tracing bytes, add until we have enough, discarding overflow.
+       if (TT.bytes) {
+-        bytes += new->len;
++      	bytes += new->len;
+         if (bytes > 0) {
+-          while (list->len <= bytes) {
+-            bytes -= list->len;
++          while(list->orig_len <= bytes) {
++            bytes -= list->orig_len;
+             free(dlist_pop(&list));
+           }
+           list->data += bytes;
+@@ -176,9 +177,14 @@
+           linepop = try[count] == '\n';
+ 
+           if (lines > 0) {
++            char c;
+             do {
+-              if (!--(list->len)) free(dlist_pop(&list));
+-            } while (*(list->data++) != '\n');
++              c = *(list->data);
++              if (!--(list->len))
++              	free(dlist_pop(&list));
++              else
++              	list->data++;
++            } while (c != '\n');
+             lines--;
+           }
+         }
